@@ -4,9 +4,7 @@
 
 class GameObject;
 
-//Player* player;
 SDL_Event Game::event;
-Wall* testWall;
 
 Game::Game() : isRunning(false), renderer(nullptr), textureManager(nullptr), window(nullptr) {
 
@@ -52,17 +50,17 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, in
 
 	textureManager = new TextureManager(renderer);
 
-	//std::shared_ptr<SDL_Texture> texture = textureManager->getTexture("Assets\\testSprite.png");
+	std::shared_ptr<SDL_Texture> texture = textureManager->getTexture("Assets\\testSprite.png");
 	//if (texture) {
 	//	std::cout << "Texture for the player was able to be loaded" << std::endl;
 	//}
 	//std::cout << texture.use_count() << std::endl;
 	//player = new Player("Assets\\testSprite.png", renderer, 0, 0, &registry, true);
-	//player = new Player(0, 0, 64, 64, renderer, texture, &registry, true, &inputManager);
+	new Player(0, 0, 64, 64, renderer, texture, true, &inputManager, *this);
 	//registry.registerObject(player);
 
-	//SDL_Color* testColor = new SDL_Color{ 0, 0, 255 ,255 };
-	//testWall = new Wall(0, 500, 1280, 300, testColor, renderer);
+	SDL_Color* testColor = new SDL_Color{ 0, 0, 255 ,255 };
+	new Wall(0, 500, 1280, 300, testColor, renderer, nullptr, true, *this);
 
 }
 
@@ -119,6 +117,7 @@ bool Game::onGameObjectCreated(GameObject* obj)
 bool Game::registerGameObject(GameObject* obj)
 {
 	registry.registerObject(obj);
+	std::cout << "GameObject Registered" << std::endl;
 	return true;
 }
 

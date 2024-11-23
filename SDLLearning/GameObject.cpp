@@ -37,6 +37,7 @@ GameObject::GameObject(int x, int y, int w, int h, SDL_Renderer* rend, std::shar
 	renderer = rend;
 	texture = tex;
 	collisionEnabled = enableCollision;
+	std::cout << "Created new game object" << std::endl;
 	gameInstance.onGameObjectCreated(this);
 }
 
