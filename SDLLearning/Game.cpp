@@ -1,8 +1,8 @@
 #include "Game.h"
-#include "GameObject.h"
 #include "Player.h"
 #include "Wall.h"
 
+class GameObject;
 
 //Player* player;
 SDL_Event Game::event;
@@ -61,9 +61,8 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, in
 	//player = new Player(0, 0, 64, 64, renderer, texture, &registry, true, &inputManager);
 	//registry.registerObject(player);
 
-	SDL_Color* testColor = new SDL_Color{ 0, 0, 255 ,255 };
-	testWall = new Wall(0, 500, 1280, 300, testColor, renderer);
-	registry.registerObject(testWall);
+	//SDL_Color* testColor = new SDL_Color{ 0, 0, 255 ,255 };
+	//testWall = new Wall(0, 500, 1280, 300, testColor, renderer);
 
 }
 
@@ -111,3 +110,15 @@ void Game::clean() {
 	TTF_Quit();
 	SDL_Quit();
 }
+
+bool Game::onGameObjectCreated(GameObject* obj)
+{
+	return registerGameObject(obj);
+}
+
+bool Game::registerGameObject(GameObject* obj)
+{
+	registry.registerObject(obj);
+	return true;
+}
+

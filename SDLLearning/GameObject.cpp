@@ -1,60 +1,7 @@
 #include "GameObject.h"
 #include <iostream>
-#include "ObjectRegistry.h"
+#include "Game.h"
 
-GameObject::GameObject(const char* textureSheet, SDL_Renderer* rend, int x, int y) {
-	renderer = rend;
-	//objTexture = TextureManager::LoadTexture(textureSheet, rend);
-
-	xpos = x;
-	ypos = y;
-	srcRect.x = 0;
-	srcRect.y = 0;
-	srcRect.w = 296;
-	srcRect.h = 296;
-	destRect.w = 64;
-	destRect.h = 64;
-	
-	//input = new InputHandler();
-}
-
-GameObject::GameObject(const char* textureSheet, SDL_Renderer* rend, int x, int y, ObjectRegistry* objReg, bool enableCollision = true) {
-	renderer = rend;
-	//objTexture = TextureManager::LoadTexture(textureSheet, rend);
-
-	xpos = x;
-	ypos = y;
-	srcRect.x = 0;
-	srcRect.y = 0;
-	srcRect.w = 296;
-	srcRect.h = 296;
-	destRect.w = 64;
-	destRect.h = 64;
-	registry = objReg;
-	collisionEnabled = enableCollision;
-	//input = new InputHandler();
-}
-
-GameObject::GameObject(int x, int y, int w, int h, SDL_Color* newColor, SDL_Renderer* rend) {
-	destRect.x = x;
-	destRect.y = y;
-	destRect.w = w;
-	destRect.h = h;
-	color = newColor;
-	renderer = rend;
-}
-
-GameObject::GameObject(int x, int y, int w, int h, SDL_Renderer* rend, std::shared_ptr<SDL_Texture> tex, ObjectRegistry* reg, bool enableCollision) {
-	destRect.x = x;
-	destRect.y = y;
-	destRect.w = w;
-	destRect.h = h;
-	renderer = rend;
-	texture = tex;
-	registry = reg;
-	collisionEnabled = enableCollision;
-
-}
 
 void GameObject::Update() {}
 
@@ -65,6 +12,10 @@ void GameObject::Render() {
 	//SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 	//SDL_RenderFillRect(renderer, &destRect);
 
+}
+
+void GameObject::Collided(GameObject* obj) {
+	// to be implemented by objects that want to do something when colliding with another object, e.g. do damage to that object
 }
 
 
@@ -78,6 +29,17 @@ bool GameObject::checkExternalCollision(const SDL_Rect& otherRect) const {
 	return false; // No collision
 }
 
+GameObject::GameObject(int x, int y, int w, int h, SDL_Renderer* rend, std::shared_ptr<SDL_Texture> tex, bool enableCollision, Game& game) : gameInstance(game) {
+	destRect.x = x;
+	destRect.y = y;
+	destRect.w = w;
+	destRect.h = h;
+	renderer = rend;
+	texture = tex;
+	collisionEnabled = enableCollision;
+	gameInstance.onGameObjectCreated(this);
+}
+
 /// \ Can be called by the children of the class to effectively "enable collision"
 /// Should be called after calculating all movements to be done, but before movement is applied to the rect.
 ///
@@ -86,15 +48,18 @@ void GameObject::handleCollision() {
 		std::cout << "You called GameObject::handleCollision but did not enable collision." << std::endl;
 		return;
 	}
-	else if (!registry) {
-		std::cout << "Collision is enabled, but you did not instantiate this GameObject with an ObjectRegistry." << std::endl;
-		std::cout << "As a result, there is nothing to collide with." << std::endl;
-		return;
-	}
+	//else if (!registry) {
+	//	std::cout << "Collision is enabled, but you did not instantiate this GameObject with an ObjectRegistry." << std::endl;
+	//	std::cout << "As a result, there is nothing to collide with." << std::endl;
+	//	return;
+	//}
 
 	SDL_Rect x_Rect{ destRect.x + xchange, destRect.y, destRect.w, destRect.h };
 	SDL_Rect y_Rect{ destRect.x, destRect.y + ychange, destRect.w, destRect.h };
-	std::vector<GameObject*> objects = registry->getObjects();
+	
+	std::vector<GameObject*> objects = gameInstance.registry.getObjects();
+	
+
 	for (GameObject* obj : objects) {
 		if (obj && obj != this) {  
 

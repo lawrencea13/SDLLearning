@@ -5,7 +5,7 @@
 #include "SDL.h"
 #include <memory>
 
-class ObjectRegistry;
+class Game;
 
 class GameObject {
 public:
@@ -29,24 +29,20 @@ public:
 
 	virtual void Update();
 	virtual void Render();
+	virtual void Collided(GameObject* obj);
 
 	
 	bool checkExternalCollision(const SDL_Rect& otherRect) const;
 
 
 protected:
-	// different constructor options for different types of children
-	// 
-	// expected for an object with a texture to load
-	GameObject(const char* textureSheet, SDL_Renderer* rend, int x, int y);
-	// expected for a debug object to use or for simple solid color blocks if intended
-	GameObject(int x, int y, int w, int h, SDL_Color* newColor, SDL_Renderer* rend);
-	// second debug option, it offers baked in collision.
-	GameObject(const char* textureSheet, SDL_Renderer* rend, int x, int y, ObjectRegistry* objReg, bool enableCollision);
-	// New texture loader, old texture options may not work with new texture loader
-	GameObject(int x, int y, int w, int h, SDL_Renderer* rend, std::shared_ptr<SDL_Texture> tex, ObjectRegistry* reg, bool enableCollision);
+
 
 	// NOTE: WALL TYPES SHOULD BE NO LARGER THAN 1270x1270
+
+	Game& gameInstance;
+
+	GameObject(int x, int y, int w, int h, SDL_Renderer* rend, std::shared_ptr<SDL_Texture> tex, bool enableCollision, Game& game);
 
 	// all x/y vars to be implemented on a per object basis.
 	// should be as close to destRect as possible
@@ -66,7 +62,6 @@ protected:
 	std::shared_ptr<SDL_Texture> texture;
 	SDL_Renderer* renderer;
 	SDL_Color* color;
-	ObjectRegistry* registry;
 
 	bool gravityEnabled = false;
 	bool collisionEnabled = false;

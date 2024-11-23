@@ -1,11 +1,7 @@
 #include "Player.h"
 
 
-Player::Player(const char* textureSheet, SDL_Renderer* rend, int x, int y, ObjectRegistry* reg, bool enableCollision) : GameObject(textureSheet, rend, x, y, reg, enableCollision), input(nullptr) {
-	Player::input = nullptr;
-}
-
-Player::Player(int x, int y, int w, int h, SDL_Renderer* rend, std::shared_ptr<SDL_Texture> tex, ObjectRegistry* reg, bool enableCollision, InputHandler* inputManager) : GameObject(x, y, w, h, rend, tex, reg, enableCollision) {
+Player::Player(int x, int y, int w, int h, SDL_Renderer* rend, std::shared_ptr<SDL_Texture> tex, bool enableCollision, InputHandler* inputManager, Game& game) : GameObject(x, y, w, h, rend, tex, enableCollision, game) {
 	//input = InputHandler();
 	collisionEnabled = true;
 	input = inputManager;

@@ -5,10 +5,7 @@
 
 class Player : public GameObject {
 public:
-	// old and unused
-	Player(const char* textureSheet, SDL_Renderer* rend, int x, int y, ObjectRegistry* reg, bool enableCollision);
-
-	Player(int x, int y, int w, int h, SDL_Renderer* rend, std::shared_ptr<SDL_Texture> tex, ObjectRegistry* reg, bool enableCollision, InputHandler* inputManager);
+	Player(int x, int y, int w, int h, SDL_Renderer* rend, std::shared_ptr<SDL_Texture> tex, bool enableCollision, InputHandler* inputManager, Game& game);
 
 	void Update() override;
 	void Render() override;

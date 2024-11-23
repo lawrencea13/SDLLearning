@@ -20,9 +20,8 @@ public:
 	void render();
 	void clean();
 
-	bool registerDrawable();
-	bool registerGameObject();
-	bool registerPhysicsObject();
+	bool onGameObjectCreated(GameObject* obj);
+	bool registerGameObject(GameObject* obj);
 
 	bool running() { return isRunning; }
 
