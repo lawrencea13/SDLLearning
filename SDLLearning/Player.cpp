@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "Game.h"
 
 
 Player::Player(int x, int y, int w, int h, SDL_Renderer* rend, std::shared_ptr<SDL_Texture> tex, bool enableCollision, InputHandler* inputManager, Game& game) : GameObject(x, y, w, h, rend, tex, enableCollision, game) {
@@ -52,7 +53,10 @@ void Player::Render() {
 	else {
 		std::cout << "Texture and the getter technically were valid?" << std::endl;
 	}*/
-	SDL_RenderCopy(renderer, texture.get(), nullptr, &destRect);
+	Camera& camera = gameInstance.getCamera();
+	SDL_Rect screenRect = camera.apply(destRect);
+
+	SDL_RenderCopy(renderer, texture.get(), nullptr, &screenRect);
 
 	//std::cout << SDL_GetError() << std::endl;
 }

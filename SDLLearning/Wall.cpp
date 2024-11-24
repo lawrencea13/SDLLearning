@@ -1,4 +1,5 @@
 #include "Wall.h"
+#include "Game.h"
 
 
 Wall::Wall(int x, int y, int w, int h, SDL_Color* newColor, SDL_Renderer* rend, std::shared_ptr<SDL_Texture> tex, bool enableCollision,Game& game) : GameObject(x, y, w, h, rend, tex, true, game) {
@@ -10,6 +11,8 @@ Wall::Wall(int x, int y, int w, int h, SDL_Color* newColor, SDL_Renderer* rend, 
 }
 
 void Wall::Render() {
+	Camera& camera = gameInstance.getCamera();
+	SDL_Rect screenRect = camera.apply(destRect);
 	SDL_SetRenderDrawColor(renderer, color->r, color->g, color->b, color->a);
-	SDL_RenderFillRect(renderer, &destRect);
+	SDL_RenderFillRect(renderer, &screenRect);
 }

@@ -7,6 +7,7 @@
 #include "TextureManager.h"
 #include "InputHandling.h"
 #include "SDL_ttf.h"
+#include "Camera.h"
 
 class Game {
 public:
@@ -27,6 +28,7 @@ public:
 
 	static SDL_Event event;
 	ObjectRegistry registry;
+	Camera& getCamera() { return camera; }
 
 private:
 	bool isRunning;
@@ -34,4 +36,5 @@ private:
 	SDL_Renderer* renderer;
 	TextureManager* textureManager;
 	InputHandler inputManager;
+	Camera camera;
 };

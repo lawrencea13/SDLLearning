@@ -6,8 +6,8 @@ class GameObject;
 
 SDL_Event Game::event;
 
-Game::Game() : isRunning(false), renderer(nullptr), textureManager(nullptr), window(nullptr) {
-
+Game::Game() : isRunning(false), renderer(nullptr), textureManager(nullptr), window(nullptr), camera(0,0,1920,1080) {
+	
 }
 Game::~Game() {
 
@@ -55,10 +55,10 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, in
 	//	std::cout << "Texture for the player was able to be loaded" << std::endl;
 	//}
 	//std::cout << texture.use_count() << std::endl;
-	//player = new Player("Assets\\testSprite.png", renderer, 0, 0, &registry, true);
-	new Player(0, 0, 64, 64, renderer, texture, true, &inputManager, *this);
-	//registry.registerObject(player);
-
+	
+	camera.followTarget(new Player(0, 0, 64, 64, renderer, texture, true, &inputManager, *this));
+	camera.setFollowBounds(SDL_Rect{ 200,200 });
+	camera.setViewportSize(1280, 720);
 	SDL_Color* testColor = new SDL_Color{ 0, 0, 255 ,255 };
 	new Wall(0, 500, 1280, 300, testColor, renderer, nullptr, true, *this);
 
@@ -86,6 +86,11 @@ void Game::update() {
 	// This avoids being a frame behind on rendering, and overall 2 frames behind from input.
 	// This would account for 33.34 ms of input delay just because of how we ordered logic at 60 fps, higher fps counts would be lower.
 	registry.update();
+	// get player position here
+	SDL_Point playerPosition = { 0,0 };
+	SDL_Rect tolerance = { 600, 300, 200, 200 };
+	
+	camera.update();
 }
 
 void Game::render() {
