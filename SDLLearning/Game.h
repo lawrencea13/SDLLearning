@@ -8,6 +8,7 @@
 #include "InputHandling.h"
 #include "SDL_ttf.h"
 #include "Camera.h"
+#include "FontManager.h"
 
 class Game {
 public:
@@ -35,6 +36,7 @@ private:
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 	TextureManager* textureManager;
+	FontManager* fontManager;
 	InputHandler inputManager;
 	Camera camera;
 };

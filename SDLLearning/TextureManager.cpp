@@ -1,20 +1,3 @@
-//#include "TextureManager.h"
-//
-//SDL_Texture* TextureManager::LoadTexture(const char* texture, SDL_Renderer* rend) {
-//	SDL_Surface* tempSurface = IMG_Load(texture);
-//	SDL_Texture* tex = SDL_CreateTextureFromSurface(rend, tempSurface);
-//	SDL_FreeSurface(tempSurface);
-//
-//	// for now, if there is an issue with loading the texture,
-//	// print out the most recent error and return null instead of the texture
-//	if (!tex) {
-//		std::cout << SDL_GetError();
-//		return NULL;
-//	}
-//
-//	return tex;
-//}
-
 #include "TextureManager.h"
 
 TextureManager::TextureManager(SDL_Renderer* rend) {
@@ -29,7 +12,7 @@ std::shared_ptr<SDL_Texture> TextureManager::getTexture(const std::string& textu
     // Check if the texture already exists in the cache
     auto it = textureCache.find(texturePath);
     if (it != textureCache.end()) {
-        return it->second; // Return the cached texture
+        return it->second;
     }
 
     // Load the texture, cache it, and return it

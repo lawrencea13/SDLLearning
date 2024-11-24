@@ -1,15 +1,17 @@
 #pragma once
 
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include <memory>
+#include "InputHandling.h"
 
 class Widget {
 public:
     // Constructor for color-only widget
-    Widget(int x, int y, int width, int height, SDL_Color color);
+    Widget(int x, int y, int width, int height, SDL_Color color, InputHandler* input, std::shared_ptr<TTF_Font> font = nullptr);
 
     // Constructor for texture-based widget
-    Widget(int x, int y, int width, int height, std::shared_ptr<SDL_Texture> texture);
+    Widget(int x, int y, int width, int height, std::shared_ptr<SDL_Texture> texture, std::shared_ptr<TTF_Font> font = nullptr);
 
     virtual ~Widget() = default;
 
@@ -53,14 +55,15 @@ public:
     // Event handlers
     virtual void onPress() = 0;
     virtual void onRelease() = 0;
-    virtual void onHover() = 0;
+    // Called when Element is Hovered and again when it is not hovered anymore
+    virtual void onHoverStateChanged() = 0;
 
     // Drag and drop events (no implementation in base class)
-    virtual void drag(int startX, int startY, int endX, int endY) = 0;
-    virtual void drop(int dropX, int dropY) = 0;
+    virtual void drag(int startX, int startY, int endX, int endY) {}
+    virtual void drop(int dropX, int dropY) {}
 
     // Key input handling for text input or other keyboard interactions
-    virtual void handleKeyInput(SDL_Keycode key) = 0;
+    virtual void handleKeyInput(SDL_Keycode key) {}
 
 protected:
     int x, y;
@@ -68,6 +71,7 @@ protected:
     SDL_Color color;
     SDL_Color colorModulation; // For applying hue adjustments
 
+    std::shared_ptr<TTF_Font> font;
     std::shared_ptr<SDL_Texture> texture;
     bool hasTexture;
 
@@ -77,5 +81,9 @@ protected:
     bool pressed = false;
     bool visible = true;
 
+    InputHandler* input;
+
     virtual void drawImpl(SDL_Renderer* renderer) = 0;
+
+    
 };

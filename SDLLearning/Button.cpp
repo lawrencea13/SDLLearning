@@ -2,8 +2,11 @@
 #include <iostream>
 
 
-Button::Button(int x, int y, int width, int height, SDL_Color color, const std::string& label)
-    : Widget(x, y, width, height, color), label(label) {}
+Button::Button(int x, int y, int width, int height, SDL_Color color, const std::string& label, InputHandler* inputMgr, std::shared_ptr<TTF_Font> font)
+    : Widget(x, y, width, height, color, inputMgr, font), label(label)
+{
+
+}
 
 Button::Button(int x, int y, int width, int height, std::shared_ptr<SDL_Texture> texture, const std::string& label)
     : Widget(x, y, width, height, texture), label(label) {}
@@ -16,6 +19,25 @@ void Button::drawImpl(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
     SDL_RenderFillRect(renderer, &destRect);
 
+    
+
+    if (font && !label.empty()) {
+        
+        SDL_Surface* textSurface = TTF_RenderText_Blended(font.get(), label.c_str(), SDL_Color{255,255,255,255});
+        if (textSurface) {
+            SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+            SDL_FreeSurface(textSurface);
+
+            SDL_Rect textRect;
+            TTF_SizeText(font.get(), label.c_str(), &textRect.w, &textRect.h);
+            textRect.x = x + (width - textRect.w) / 2; // Center text horizontally
+            textRect.y = y + (height - textRect.h) / 2; // Center text vertically
+
+            SDL_RenderCopy(renderer, textTexture, nullptr, &textRect);
+            SDL_DestroyTexture(textTexture);
+        }
+    }
+
     //std::cout << "Button: " << label << " drawn at position (" << x << ", " << y << ")" << std::endl;
 }
 
@@ -27,4 +49,14 @@ void Button::onPress() {
 // Release method for the button
 void Button::onRelease() {
     std::cout << "Button: " << label << " is released." << std::endl;
+}
+
+void Button::onHoverStateChanged()
+{
+    if (hovered) {
+        std::cout << "Button: " << label << " is hovered." << std::endl;
+    }
+    else {
+        std::cout << "Button: " << label << " is no longer hovered." << std::endl;
+    }
 }

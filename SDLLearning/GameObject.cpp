@@ -62,7 +62,9 @@ void GameObject::handleCollision() {
 	
 
 	for (GameObject* obj : objects) {
-		if (obj && obj != this) {  
+		// make sure obj still valid, make sure the obj is not this obj
+		// make sure obj collision is enabled
+		if (obj && obj != this && obj->collisionEnabled) {  
 
 			SDL_Rect* otherRect = &(obj->getRect());
 

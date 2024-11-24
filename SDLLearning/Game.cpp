@@ -1,9 +1,12 @@
 #include "Game.h"
 #include "Player.h"
 #include "Wall.h"
+#include "Button.h"
 
 class GameObject;
 
+Button* testButton;
+Button* testButton2;
 SDL_Event Game::event;
 
 Game::Game() : isRunning(false), renderer(nullptr), textureManager(nullptr), window(nullptr), camera(0,0,1920,1080) {
@@ -49,18 +52,25 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, in
 	}
 
 	textureManager = new TextureManager(renderer);
+	fontManager = new FontManager();
 
-	std::shared_ptr<SDL_Texture> texture = textureManager->getTexture("Assets\\testSprite.png");
-	//if (texture) {
-	//	std::cout << "Texture for the player was able to be loaded" << std::endl;
-	//}
-	//std::cout << texture.use_count() << std::endl;
+	std::shared_ptr<TTF_Font> font = fontManager->getFont("Assets\\IMMORTAL.ttf", 24);
+	std::shared_ptr<TTF_Font> largeFont = fontManager->getFont("Assets\\IMMORTAL.ttf", 30);
+
+	// All of the things below this are for testing
+	// Ultimately this will load and cache textures then start at the main menu, and things will go from there.
+	//std::shared_ptr<SDL_Texture> texture = textureManager->getTexture("Assets\\testSprite.png");
 	
-	camera.followTarget(new Player(0, 0, 64, 64, renderer, texture, true, &inputManager, *this));
-	camera.setFollowBounds(SDL_Rect{ 200,200 });
+	//camera.followTarget(new Player(0, 0, 64, 64, renderer, texture, true, &inputManager, *this));
+	//camera.setFollowBounds(SDL_Rect{ 200,200 });
 	camera.setViewportSize(1280, 720);
-	SDL_Color* testColor = new SDL_Color{ 0, 0, 255 ,255 };
-	new Wall(0, 500, 1280, 300, testColor, renderer, nullptr, true, *this);
+	//SDL_Color* testColor = new SDL_Color{ 0, 0, 255 ,255 };
+	//new Wall(0, 500, 1280, 300, testColor, renderer, nullptr, true, *this);
+	if (font) {
+		std::cerr << "Font was loaded succesfully" << std::endl;
+	}
+	testButton = new Button(100, 100, 200, 100, SDL_Color{ 0, 100, 100, 100 }, "Test Button", &inputManager, font);
+	testButton2 = new Button(400, 100, 200, 100, SDL_Color{ 0, 100, 100, 100 }, "Test Button", &inputManager, largeFont);
 
 }
 
@@ -86,10 +96,7 @@ void Game::update() {
 	// This avoids being a frame behind on rendering, and overall 2 frames behind from input.
 	// This would account for 33.34 ms of input delay just because of how we ordered logic at 60 fps, higher fps counts would be lower.
 	registry.update();
-	// get player position here
-	SDL_Point playerPosition = { 0,0 };
-	SDL_Rect tolerance = { 600, 300, 200, 200 };
-	
+	// camera must be kept separate as it's not a game object
 	camera.update();
 }
 
@@ -101,7 +108,9 @@ void Game::render() {
 	//put stuff to render here
 	//player->Render();
 	registry.draw();
-
+	// testing button render
+	testButton->drawImpl(renderer);
+	testButton2->drawImpl(renderer);
 	SDL_RenderPresent(renderer);
 	
 }

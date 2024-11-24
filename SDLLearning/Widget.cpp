@@ -1,10 +1,10 @@
 #include "Widget.h"
 
-Widget::Widget(int x, int y, int width, int height, SDL_Color color)
-    : x(x), y(y), width(width), height(height), color(color), texture(nullptr), hasTexture(false), colorModulation{ 255, 255, 255, 255 } /*color mod not really used for solid colors*/ {}
+Widget::Widget(int x, int y, int width, int height, SDL_Color color, InputHandler* inputMgr, std::shared_ptr<TTF_Font> font)
+    : x(x), y(y), width(width), height(height), color(color), texture(nullptr), hasTexture(false), colorModulation{ 255, 255, 255, 255 }, input(inputMgr), font(font) {}
 
-Widget::Widget(int x, int y, int width, int height, std::shared_ptr<SDL_Texture> texture)
-    : x(x), y(y), width(width), height(height), color({ 0, 0, 0, 0 }), texture(texture), hasTexture(true), colorModulation{ 255, 255, 255, 255 } {}
+Widget::Widget(int x, int y, int width, int height, std::shared_ptr<SDL_Texture> texture, std::shared_ptr<TTF_Font> font)
+    : x(x), y(y), width(width), height(height), color({ 0, 0, 0, 0 }), texture(texture), hasTexture(true), colorModulation{ 255, 255, 255, 255 }, font(font) {}
 
 // \Implementation of basic draw lacks any additional checks
 // \Requires own implementation of things like a visibility check.
@@ -29,6 +29,20 @@ void Widget::draw(SDL_Renderer* renderer) {
 
 void Widget::update()
 {
+    SDL_Point mouseLocation = SDL_Point{ input->getMouseX(),input->getMouseY() };
+    if (mouseLocation.x > x && mouseLocation.x < x + width && mouseLocation.y > y && mouseLocation.y < y + height) {
+        // mouse is over the widget
+        setHovered(true);
+        if (input->isMouseButtonDown(SDL_BUTTON_LEFT)) {
+            setPressed(true);
+        }
+        else {
+            setPressed(false);
+        }
+    }
+    else {
+        setHovered(false);
+    }
 }
 
 void Widget::setPosition(int x, int y) {
@@ -70,27 +84,33 @@ bool Widget::isHovered() const
 void Widget::setHovered(bool state)
 {
     if (hovered == state) return;
-    if (!hovered) {
-        onHover();
-    }
-    else {
-
-    }
     hovered = state;
+    if (!hovered && pressed) {
+        onRelease();
+    }
+    onHoverStateChanged();
 }
 
 bool Widget::isPressed() const
 {
-    return false;
+    return pressed;
 }
 
 void Widget::setPressed(bool state)
 {
+    if (pressed == state) return;
+    pressed = state;
+    if (pressed) {
+        onPress();
+    }
+    else {
+        onRelease();
+    }
 }
 
 bool Widget::isVisible() const
 {
-    return false;
+    return visible;
 }
 
 void Widget::setVisible(bool state)
