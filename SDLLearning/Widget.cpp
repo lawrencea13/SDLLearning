@@ -29,20 +29,97 @@ void Widget::draw(SDL_Renderer* renderer) {
 
 void Widget::update()
 {
-    SDL_Point mouseLocation = SDL_Point{ input->getMouseX(),input->getMouseY() };
-    if (mouseLocation.x > x && mouseLocation.x < x + width && mouseLocation.y > y && mouseLocation.y < y + height) {
-        // mouse is over the widget
-        setHovered(true);
+    // Old logic
+    //SDL_Point mouseLocation = SDL_Point{ input->getMouseX(),input->getMouseY() };
+    //// get the info from the prior frame to determine what we can do on current frame
+    //bool priorFrameCanPress = canPress;
+
+    //if (isVisible()) {
+    //    /*
+    //    * There might be a better way to do this but this is what I came up with to retain all functionality without much compromise.
+    //    * canPress itself is always set for the NEXT frame, meaning it is never to be checked here, instead we use the local priorFrameCanPress
+    //    * If the mouse is not already hovering the widget, we don't want a mouse down to trigger the button
+    //    * Previously, This worked EXCEPT for when holding M1 and dragging across the screen until it hits the button
+    //    * Now, we only set canPress to true if we are hovering AND not clicked
+    //    * The canPress var may be set multiple times in a frame, but it should always produce the correct result.
+    //    */
+    //    if (mouseLocation.x > x && mouseLocation.x < x + width && mouseLocation.y > y && mouseLocation.y < y + height) {
+    //        // mouse is over the widget
+    //        setHovered(true);
+    //        canPress = true;
+
+    //        if (input->isMouseButtonDown(SDL_BUTTON_LEFT) && priorFrameCanPress) { 
+    //            setPressed(true);
+    //        }
+    //        else {
+    //            setPressed(false);
+    //            canPress = true;
+    //        }
+
+    //        if (input->isMouseButtonDown(SDL_BUTTON_LEFT) && !priorFrameCanPress) {
+    //            canPress = false;
+    //        }
+
+    //    }
+    //    else {
+    //        setHovered(false);
+    //        if (input->isMouseButtonDown(SDL_BUTTON_LEFT)) {
+    //            canPress = false;
+    //        }
+
+    //        // can't press if not hovering
+    //        // Doesn't disable on press but prevents the mouse from accidentally activating.
+    //        canPress = false;
+    //    }
+    //}
+    //else {
+    //    // reset state, does nothing if state already reset
+    //    setPressed(false);
+    //    setHovered(false);
+    //    // can't press if invisible
+    //    canPress = false;
+    //}
+
+    // new logic, much more readable :)
+    // Gonna leave the old logic in because I plan to have it looked at
+
+    SDL_Point mouseLocation = { input->getMouseX(), input->getMouseY() };
+    bool priorFrameCanPress = canPress; 
+
+    // instead of nesting, reset the button and return
+    if (!isVisible()) {
+        setPressed(false);
+        setHovered(false);
+        canPress = false;
+        return;
+    }
+
+    bool isHovering = (mouseLocation.x > x && mouseLocation.x < x + width &&
+        mouseLocation.y > y && mouseLocation.y < y + height);
+
+    setHovered(isHovering);
+
+    if (isHovering) {
         if (input->isMouseButtonDown(SDL_BUTTON_LEFT)) {
-            setPressed(true);
+            if (priorFrameCanPress) {
+                setPressed(true);
+            }
+            else {
+                canPress = false;
+            }
         }
         else {
             setPressed(false);
+            canPress = true;
         }
     }
     else {
-        setHovered(false);
+        setPressed(false);
+        // Instead of doing a bunch of complex checks, just set canPress to the opposite of mouse down since that/
+        //  makes the widget not clickable if you were holding M1 before you dragged...DUH
+        canPress = !input->isMouseButtonDown(SDL_BUTTON_LEFT);
     }
+    
 }
 
 void Widget::setPosition(int x, int y) {
@@ -86,7 +163,12 @@ void Widget::setHovered(bool state)
     if (hovered == state) return;
     hovered = state;
     if (!hovered && pressed) {
-        onRelease();
+        // Was initially set to call on release
+        // However, after reading up on UI design and experimenting
+        // The button will reset and no action will be taken since a press and unhover typically means a change of heart.
+        //onRelease();
+        // Instead, simply set pressed to false.
+        pressed = false;
     }
     onHoverStateChanged();
 }

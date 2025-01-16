@@ -81,6 +81,9 @@ protected:
     bool pressed = false;
     bool visible = true;
 
+    // added later to avoid m1 being pressed before hovering over button for activation
+    bool canPress = false;
+
     InputHandler* input;
 
     virtual void drawImpl(SDL_Renderer* renderer) = 0;

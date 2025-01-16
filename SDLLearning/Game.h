@@ -9,6 +9,7 @@
 #include "SDL_ttf.h"
 #include "Camera.h"
 #include "FontManager.h"
+#include "Canvas.h"
 
 class Game {
 public:
@@ -29,6 +30,7 @@ public:
 
 	static SDL_Event event;
 	ObjectRegistry registry;
+	std::unique_ptr<Canvas> widgetScreen;
 	Camera& getCamera() { return camera; }
 
 private:
