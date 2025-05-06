@@ -1,5 +1,1 @@
-2D Platformer with integrated level designer simply for learning SDL and C++.
-
-This is my first C++ application, which will expand as I learn.
-
-Eventually, a CMAKE will be added with build instructions, and more technical information will be added here when I can.
+This was originally going to be a 2d platformer. It's turning into a 2d MMO game with SDL2 and ENet. More to come later.
