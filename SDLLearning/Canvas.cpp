@@ -32,3 +32,29 @@ const std::vector<std::shared_ptr<Widget>>& Canvas::getWidgets() const
 {
     return widgets;
 }
+
+std::vector<std::shared_ptr<Widget>> Canvas::getWidgetsbyLayer(const std::string& layer) const
+{
+    std::vector<std::shared_ptr<Widget>> filteredWidgets;
+
+    for (const auto& widget : widgets) {
+        if (widget->getLayer() == layer) {
+            filteredWidgets.push_back(widget);
+        }
+    }
+
+    return filteredWidgets;
+}
+
+std::vector<std::shared_ptr<Widget>> Canvas::getWidgetNotinLayer(const std::string& layer) const
+{
+    std::vector<std::shared_ptr<Widget>> filteredWidgets;
+
+    for (const auto& widget : widgets) {
+        if (widget->getLayer() != layer) {
+            filteredWidgets.push_back(widget);
+        }
+    }
+
+    return filteredWidgets;
+}

@@ -14,6 +14,8 @@ public:
     void addWidget(std::shared_ptr<Widget> widget);
 
     const std::vector<std::shared_ptr<Widget>>& getWidgets() const;
+    std::vector<std::shared_ptr<Widget>> getWidgetsbyLayer(const std::string& layer) const;
+    std::vector<std::shared_ptr<Widget>> getWidgetNotinLayer(const std::string& layer) const;
 
 private:
     SDL_Renderer* renderer;

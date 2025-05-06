@@ -10,6 +10,8 @@
 #include "Camera.h"
 #include "FontManager.h"
 #include "Canvas.h"
+#include "NetworkManager.h"
+#include <steam/steam_api.h>
 
 class Game {
 public:
@@ -22,6 +24,7 @@ public:
 	void update();
 	void render();
 	void clean();
+	void SteamLogin();
 
 	bool onGameObjectCreated(GameObject* obj);
 	bool registerGameObject(GameObject* obj);
@@ -41,4 +44,5 @@ private:
 	FontManager* fontManager;
 	InputHandler inputManager;
 	Camera camera;
+	NetworkManager networkManager;
 };

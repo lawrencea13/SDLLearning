@@ -16,22 +16,19 @@ public:
     virtual ~Widget() = default;
 
     virtual void draw(SDL_Renderer* renderer);
+
     virtual void update();
 
-    // Position and size setters
     void setPosition(int x, int y);
     void setSize(int width, int height);
 
-    // Color modulation (for state-based color changes)
     void setColorModulation(Uint8 r, Uint8 g, Uint8 b);
 
-    // Getters for position and size
     int getX() const;
     int getY() const;
     int getWidth() const;
     int getHeight() const;
 
-    // State setters and getters
     bool isEnabled() const;
     void setEnabled(bool state);
 
@@ -65,6 +62,12 @@ public:
     // Key input handling for text input or other keyboard interactions
     virtual void handleKeyInput(SDL_Keycode key) {}
 
+    const std::string& getLayer() const;
+    void setLayer
+    (const std::string& newLayer);
+
+    
+
 protected:
     int x, y;
     int width, height;
@@ -87,6 +90,11 @@ protected:
     InputHandler* input;
 
     virtual void drawImpl(SDL_Renderer* renderer) = 0;
+
+    std::string id;
+
+private:
+    std::string layer;
 
     
 };

@@ -16,7 +16,7 @@ void Button::drawImpl(SDL_Renderer* renderer) {
     SDL_Rect destRect = { x, y, width, height };
     //SDL_RenderCopy(renderer, texture.get(), nullptr, &destRect);
 
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+    SDL_SetRenderDrawColor(renderer, color.r + colorModulation.r, color.g + colorModulation.g, color.b + colorModulation.b, color.a);
     SDL_RenderFillRect(renderer, &destRect);
 
     
@@ -38,25 +38,34 @@ void Button::drawImpl(SDL_Renderer* renderer) {
         }
     }
 
-    //std::cout << "Button: " << label << " drawn at position (" << x << ", " << y << ")" << std::endl;
 }
 
-// Press method for the button
+void Button::setOnPress(std::function<void()> callback)
+{
+    onPressCallback = callback;
+}
+
+void Button::setOnRelease(std::function<void()> callback)
+{
+    onReleaseCallback = callback;
+}
+
 void Button::onPress() {
-    std::cout << "Button: " << label << " is pressed." << std::endl;
+    if (onPressCallback) onPressCallback();
 }
 
-// Release method for the button
 void Button::onRelease() {
-    std::cout << "Button: " << label << " is released." << std::endl;
+    if (onReleaseCallback) onReleaseCallback();
 }
+
+
 
 void Button::onHoverStateChanged()
 {
     if (hovered) {
-        std::cout << "Button: " << label << " is hovered." << std::endl;
+        setColorModulation(50, 50, 50);
     }
     else {
-        std::cout << "Button: " << label << " is no longer hovered." << std::endl;
+        setColorModulation(0, 0, 0);
     }
 }

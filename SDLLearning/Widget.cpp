@@ -1,10 +1,10 @@
 #include "Widget.h"
 
 Widget::Widget(int x, int y, int width, int height, SDL_Color color, InputHandler* inputMgr, std::shared_ptr<TTF_Font> font)
-    : x(x), y(y), width(width), height(height), color(color), texture(nullptr), hasTexture(false), colorModulation{ 255, 255, 255, 255 }, input(inputMgr), font(font) {}
+    : x(x), y(y), width(width), height(height), color(color), texture(nullptr), hasTexture(false), colorModulation{ 0, 0, 0, 0 }, input(inputMgr), font(font) {}
 
 Widget::Widget(int x, int y, int width, int height, std::shared_ptr<SDL_Texture> texture, std::shared_ptr<TTF_Font> font)
-    : x(x), y(y), width(width), height(height), color({ 0, 0, 0, 0 }), texture(texture), hasTexture(true), colorModulation{ 255, 255, 255, 255 }, font(font) {}
+    : x(x), y(y), width(width), height(height), color({ 0, 0, 0, 0 }), texture(texture), hasTexture(true), colorModulation{ 0, 0, 0, 0 }, font(font) {}
 
 // \Implementation of basic draw lacks any additional checks
 // \Requires own implementation of things like a visibility check.
@@ -29,59 +29,7 @@ void Widget::draw(SDL_Renderer* renderer) {
 
 void Widget::update()
 {
-    // Old logic
-    //SDL_Point mouseLocation = SDL_Point{ input->getMouseX(),input->getMouseY() };
-    //// get the info from the prior frame to determine what we can do on current frame
-    //bool priorFrameCanPress = canPress;
 
-    //if (isVisible()) {
-    //    /*
-    //    * There might be a better way to do this but this is what I came up with to retain all functionality without much compromise.
-    //    * canPress itself is always set for the NEXT frame, meaning it is never to be checked here, instead we use the local priorFrameCanPress
-    //    * If the mouse is not already hovering the widget, we don't want a mouse down to trigger the button
-    //    * Previously, This worked EXCEPT for when holding M1 and dragging across the screen until it hits the button
-    //    * Now, we only set canPress to true if we are hovering AND not clicked
-    //    * The canPress var may be set multiple times in a frame, but it should always produce the correct result.
-    //    */
-    //    if (mouseLocation.x > x && mouseLocation.x < x + width && mouseLocation.y > y && mouseLocation.y < y + height) {
-    //        // mouse is over the widget
-    //        setHovered(true);
-    //        canPress = true;
-
-    //        if (input->isMouseButtonDown(SDL_BUTTON_LEFT) && priorFrameCanPress) { 
-    //            setPressed(true);
-    //        }
-    //        else {
-    //            setPressed(false);
-    //            canPress = true;
-    //        }
-
-    //        if (input->isMouseButtonDown(SDL_BUTTON_LEFT) && !priorFrameCanPress) {
-    //            canPress = false;
-    //        }
-
-    //    }
-    //    else {
-    //        setHovered(false);
-    //        if (input->isMouseButtonDown(SDL_BUTTON_LEFT)) {
-    //            canPress = false;
-    //        }
-
-    //        // can't press if not hovering
-    //        // Doesn't disable on press but prevents the mouse from accidentally activating.
-    //        canPress = false;
-    //    }
-    //}
-    //else {
-    //    // reset state, does nothing if state already reset
-    //    setPressed(false);
-    //    setHovered(false);
-    //    // can't press if invisible
-    //    canPress = false;
-    //}
-
-    // new logic, much more readable :)
-    // Gonna leave the old logic in because I plan to have it looked at
 
     SDL_Point mouseLocation = { input->getMouseX(), input->getMouseY() };
     bool priorFrameCanPress = canPress; 
@@ -197,4 +145,12 @@ bool Widget::isVisible() const
 
 void Widget::setVisible(bool state)
 {
+}
+
+const std::string& Widget::getLayer() const {
+    return layer;
+}
+
+void Widget::setLayer(const std::string& newLayer) {
+    layer = newLayer;
 }
