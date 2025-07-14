@@ -2,12 +2,13 @@
 #include "Game.h"
 
 
-Wall::Wall(int x, int y, int w, int h, SDL_Color* newColor, SDL_Renderer* rend, std::shared_ptr<SDL_Texture> tex, bool enableCollision,Game& game) : GameObject(x, y, w, h, rend, tex, true, game) {
+Wall::Wall(int x, int y, int w, int h, SDL_Color* newColor, std::shared_ptr<SDL_Texture> tex,Game& game) : GameObject(x, y, w, h, tex, game) {
 	color = newColor;
 	destRect.x = x;
 	destRect.y = y;
 	destRect.w = w;
 	destRect.h = h;
+	collisionEnabled = true;
 }
 
 void Wall::Render() {

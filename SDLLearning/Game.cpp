@@ -28,6 +28,8 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, in
 		std::cout << "ENet successfully initialized.\n";
 	}
 
+	playerManager = std::make_shared<PlayerManager>();
+
 #ifdef DEDICATED_SERVER
 	std::cout << "Starting server (dedicated build)..." << std::endl;
 	if (!networkManager.startServer(1234)) {
@@ -38,6 +40,11 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, in
 	std::cout << "Server started successfully!" << std::endl;
 	isRunning = true;
 	SteamLogin();
+
+	networkManager.onPlayerAuthenticated = [this](uint64_t steamID, ENetPeer* peer) {
+		this->handleNewPlayerConnection(steamID, peer);
+		};
+
 	return; // Skip SDL and rendering init
 #else
 	SteamLogin();
@@ -46,7 +53,14 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, in
 		isRunning = false;
 		return;
 	}
+
+	networkManager.onPlayerStateReceived = [this](const ServerStatePacket& state) {
+		this->clientHandleInitialConnect(state);
+		};
 	
+	networkManager.setServerStateCallback([this](const ServerStatePacket& state) {
+		this->receiveServerStateUpdate(state);
+		});
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
 		std::cout << "Subsystem initialized." << std::endl;
@@ -86,11 +100,12 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, in
 
 	// All of the things below this are for testing
 	// Ultimately this will load and cache textures then start at the main menu, and things will go from there.
-	//std::shared_ptr<SDL_Texture> texture = textureManager->getTexture("Assets\\testSprite.png");
 	
-	//camera.followTarget(new Player(0, 0, 64, 64, renderer, texture, true, &inputManager, *this));
-	//camera.setFollowBounds(SDL_Rect{ 200,200 });
-	camera.setViewportSize(1280, 720);
+
+	//camera.followTarget(new Player(100, 100, 64, 64, texture, *this));
+
+	
+
 	//SDL_Color* testColor = new SDL_Color{ 0, 0, 255 ,255 };
 	//new Wall(0, 500, 1280, 300, testColor, renderer, nullptr, true, *this);
 	std::shared_ptr<TTF_Font> font = fontManager->getFont("Assets\\IMMORTAL.ttf", 24);
@@ -103,6 +118,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, in
 	std::shared_ptr<Button> testButton = std::make_shared<Button>(100, 100, 200, 100, SDL_Color{ 0, 100, 100, 100 }, "Test Button", &inputManager, font);
 	testButton->setOnRelease([]() {
 		std::cout << "Start button pressed!" << std::endl;
+
 		});
 
 	widgetScreen->addWidget(testButton);
@@ -112,7 +128,6 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, in
 	
 
 }
-
 
 
 void Game::handleEvents() {
@@ -202,6 +217,127 @@ void Game::SteamLogin()
 
 }
 
+#ifdef DEDICATED_SERVER
+void Game::handleNewPlayerConnection(uint64_t steamID, ENetPeer* peer)
+{
+	//// change later when we have saving implemented
+	//int spawnX = 100, spawnY = 100;
+	//Player* newPlayer = new Player(spawnX, spawnY, 64, 64, nullptr, *this);
+	//newPlayer->setSteamID(steamID);
+	//networkManager.associatePlayer(steamID, newPlayer);
+	//registry.registerObject(newPlayer);
+
+	//std::vector<ServerStatePacket> allPlayers;
+
+	//for (const auto& [otherSteamID, conn] : *networkManager.getConnections()) {
+	//	if (!conn.player) continue;
+	//	ServerStatePacket info;
+	//	info.steamID = otherSteamID;
+	//	info.posX = (float)conn.player->getDimensions().x;
+	//	info.posY = (float)conn.player->getDimensions().y;
+	//	allPlayers.push_back(info);
+	//}
+
+	//networkManager.sendPacketToPeer(
+	//	PACKET_CONNECTED_PLAYER_LIST,
+	//	allPlayers.data(),
+	//	allPlayers.size() * sizeof(ServerStatePacket),
+	//	peer,
+	//	0
+	//);
+
+	//ServerStatePacket newPlayerInfo;
+	//newPlayerInfo.steamID = steamID;
+	//newPlayerInfo.posX = (float)spawnX;
+	//newPlayerInfo.posY = (float)spawnY;
+
+	//networkManager.broadcastToAllExcept(
+	//	PACKET_NEW_PLAYER_CONNECTED,
+	//	&newPlayerInfo,
+	//	sizeof(newPlayerInfo),
+	//	peer,
+	//	0
+	//);
+
+	int spawnX = 100, spawnY = 100;
+	// nullptr for now on texture, don't really care on the server what the texture is tbh
+	// server will track somehow down the road when it becomes relevant
+	// this logic is gonna get tore up again anyway when the saving/loading system is implemented
+	auto newPlayer = playerManager->CreatePlayer(steamID, spawnX, spawnY, 64, 64, nullptr, *this);
+	newPlayer->setSteamID(steamID);
+
+	// Associate this player with the SteamID in the NetworkManager
+	//networkManager.associatePlayer(steamID, newPlayer.get());
+
+	// Register with the game registry if needed
+	registry.registerObject(newPlayer.get());
+
+	// 1. Send all current players (including new one) to the new peer
+	std::vector<ServerStatePacket> allPlayers;
+
+	for (const auto& [id, playerPtr] : playerManager->GetAllPlayers()) {
+		if (!playerPtr) continue;
+
+		ServerStatePacket info;
+		info.steamID = id;
+		info.posX = static_cast<float>(playerPtr->getDimensions().x);
+		info.posY = static_cast<float>(playerPtr->getDimensions().y);
+		allPlayers.push_back(info);
+	}
+
+	if (!allPlayers.empty()) {
+		networkManager.sendPacketToPeer(
+			PACKET_CONNECTED_PLAYER_LIST,
+			allPlayers.data(),
+			allPlayers.size() * sizeof(ServerStatePacket),
+			peer,
+			0
+		);
+	}
+
+	// 2. Broadcast new player info to all other clients
+	ServerStatePacket newPlayerInfo;
+	newPlayerInfo.steamID = steamID;
+	newPlayerInfo.posX = static_cast<float>(spawnX);
+	newPlayerInfo.posY = static_cast<float>(spawnY);
+
+	networkManager.broadcastToAllExcept(
+		PACKET_NEW_PLAYER_CONNECTED,
+		&newPlayerInfo,
+		sizeof(newPlayerInfo),
+		peer,
+		0
+	);
+
+
+}
+
+#endif
+
+void Game::clientHandleInitialConnect(const ServerStatePacket& state)
+{
+	std::cout << "Received initial connect state for player SteamID: " << state.steamID << " at position (" << state.posX << ", " << state.posY << ")\n";
+	/*Connection* conn = networkManager.getConnection(state.steamID);
+
+	Player* player = conn ? conn->player : nullptr;
+
+	if (!player) {
+		std::shared_ptr<SDL_Texture> texture = textureManager->getTexture("Assets\\testSprite.png");
+		bool isLocal = (state.steamID == networkManager.getLocalSteamID());
+		Player* newPlayer = new Player((int)state.posX, (int)state.posY, 64, 64, texture, *this);
+		newPlayer->setIsLocalPlayer(isLocal);
+		registry.registerObject(newPlayer);
+		if (isLocal) {
+			localPlayer = newPlayer;
+		}
+		networkManager.addClientConnection(state.steamID, localPlayer);
+
+		camera.followTarget(localPlayer);
+		camera.setFollowBounds(SDL_Rect{ 200,200 });
+		camera.setViewportSize(1280, 720);
+	}*/
+}
+
 bool Game::onGameObjectCreated(GameObject* obj)
 {
 	return registerGameObject(obj);
@@ -213,4 +349,10 @@ bool Game::registerGameObject(GameObject* obj)
 	std::cout << "GameObject Registered" << std::endl;
 	return true;
 }
+
+void Game::receiveServerStateUpdate(const ServerStatePacket& state)
+{
+}
+
+
 

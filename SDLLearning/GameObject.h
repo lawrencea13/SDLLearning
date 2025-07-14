@@ -9,7 +9,8 @@ class Game;
 
 class GameObject {
 public:
-	
+	GameObject(int x, int y, int w, int h, std::shared_ptr<SDL_Texture> tex, Game& game);
+
 	virtual ~GameObject() {}
 
 	auto getLocation() {
@@ -20,6 +21,11 @@ public:
 	auto getDimensions() {
 		struct result { int x; int y; };
 		return result{ destRect.w, destRect.h };
+	}
+
+	void setLocation(int x, int y) {
+		destRect.x = x;
+		destRect.y = y;
 	}
 
 	// probably the only thing that's necessary but I will leave location, dimensions and the full rect available.
@@ -41,9 +47,7 @@ protected:
 	// NOTE: WALL TYPES SHOULD BE NO LARGER THAN 1270x1270
 
 	Game& gameInstance;
-
-	GameObject(int x, int y, int w, int h, SDL_Renderer* rend, std::shared_ptr<SDL_Texture> tex, bool enableCollision, Game& game);
-
+	
 	// all x/y vars to be implemented on a per object basis.
 	// should be as close to destRect as possible
 	int xpos;
@@ -60,7 +64,7 @@ protected:
 	SDL_Rect srcRect, destRect;
 	//SDL_Texture* objTexture;
 	std::shared_ptr<SDL_Texture> texture;
-	SDL_Renderer* renderer;
+	SDL_Renderer* renderer = nullptr;
 	SDL_Color* color;
 
 	bool gravityEnabled = false;

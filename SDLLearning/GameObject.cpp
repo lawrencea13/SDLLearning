@@ -29,16 +29,15 @@ bool GameObject::checkExternalCollision(const SDL_Rect& otherRect) const {
 	return false; // No collision
 }
 
-GameObject::GameObject(int x, int y, int w, int h, SDL_Renderer* rend, std::shared_ptr<SDL_Texture> tex, bool enableCollision, Game& game) : gameInstance(game) {
+GameObject::GameObject(int x, int y, int w, int h, std::shared_ptr<SDL_Texture> tex, Game& game) : gameInstance(game), renderer(game.getRenderer())
+{
 	destRect.x = x;
 	destRect.y = y;
 	destRect.w = w;
 	destRect.h = h;
-	renderer = rend;
 	texture = tex;
-	collisionEnabled = enableCollision;
 	std::cout << "Created new game object" << std::endl;
-	gameInstance.onGameObjectCreated(this);
+	game.onGameObjectCreated(this);
 }
 
 /// \ Can be called by the children of the class to effectively "enable collision"
