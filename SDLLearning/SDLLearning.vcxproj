@@ -377,6 +377,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>E:\SDL2_image\include;E:\SDL2\include;E:\ENet\include;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -392,6 +393,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>E:\SDL2_image\include;E:\SDL2\include;E:\ENet\include;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -407,6 +409,7 @@
       <PreprocessorDefinitions>DEDICATED_SERVER;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>E:\SDL2_image\include;E:\SDL2\include;E:\ENet\include;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -422,6 +425,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>E:\SDL2_image\include;E:\SDL2\include;E:\ENet\include;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -437,6 +441,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>E:\SDL2_image\include;E:\SDL2\include;E:\ENet\include;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -454,6 +459,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>E:\SDL2_image\include;E:\SDL2\include;E:\ENet\include;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -473,6 +479,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>E:\SDL2_image\include;E:\SDL2\include;E:\ENet\include;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -492,6 +499,7 @@
       <PreprocessorDefinitions>DEDICATED_SERVER;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>E:\SDL2_image\include;E:\SDL2\include;E:\ENet\include;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -516,7 +524,8 @@
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Wall.cpp" />
     <ClCompile Include="Widget.cpp" />
-    <ClCompile Include="Widget.h" />
+    <ClInclude Include="PlayerManager.h" />
+    <ClInclude Include="Widget.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Button.h" />
@@ -524,12 +533,14 @@
     <ClInclude Include="Canvas.h" />
     <ClInclude Include="FontManager.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameConstants.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="InputHandling.h" />
     <ClInclude Include="LevelLoader.h" />
     <ClInclude Include="NetworkManager.h" />
     <ClInclude Include="NetworkPackets.h" />
     <ClInclude Include="ObjectRegistry.h" />
+    <ClInclude Include="PacketDispatcher.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="Wall.h" />

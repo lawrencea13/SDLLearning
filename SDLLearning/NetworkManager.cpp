@@ -2,7 +2,7 @@
 #include <iostream>
 #include <steam/steam_api.h>
 #include <vector>
-#include "NetworkPackets.h"
+
 
 
 NetworkManager::NetworkManager() {}
@@ -44,47 +44,15 @@ void NetworkManager::serviceNetwork() {
             }
 
             uint8_t packetType = event.packet->data[0];
-            std::cout << "Received a packetboi\n";
-            switch (packetType) {
-            case PACKET_AUTH_TICKET: {
-                if (event.packet->dataLength < 9) break;
+            dispatcher.dispatch(packetType, event.packet, event.peer);
 
-                const uint8_t* packetData = event.packet->data;
-                uint64_t steamID64;
-                memcpy(&steamID64, packetData + 1, sizeof(uint64));
-
-                CSteamID steamID(steamID64);
-
-                const uint8_t* ticketData = packetData + 1 + sizeof(uint64);
-                int ticketLen = event.packet->dataLength - 1 - sizeof(uint64);
-
-                EBeginAuthSessionResult result = SteamGameServer()->BeginAuthSession(
-                    ticketData,
-                    ticketLen,
-                    steamID
-                );
-
-                if (result == k_EBeginAuthSessionResultOK) {
-                    std::cout << "Steam auth successful for SteamID: " << steamID64 << "\n";
-                    clientSteamIDs[event.peer] = steamID;
-                }
-                else {
-                    std::cout << "Steam auth failed: " << static_cast<int>(result) << "\n";
-                    enet_peer_disconnect(event.peer, 0);
-                }
-                break;
-            }
-
-            default:
-                std::cout << "Unknown packet type: " << static_cast<int>(packetType) << "\n";
-                break;
-            }
             enet_packet_destroy(event.packet);
             break;
         }
 
         case ENET_EVENT_TYPE_DISCONNECT:
             std::cout << "A client disconnected.\n";
+            //connections.erase(getClientSteamID(event.peer).ConvertToUint64());
             clientSteamIDs.erase(event.peer);
             break;
         }
@@ -94,14 +62,17 @@ void NetworkManager::serviceNetwork() {
     ENetEvent event;
 
     while (enet_host_service(client, &event, 0) > 0) {
-        std::cout << "Client network event occurred\n";
+        uint8_t packetType = event.packet->data[0];
         switch (event.type) {
         case ENET_EVENT_TYPE_CONNECT:
-            std::cout << "Connected to server.\n";
+            std::cout << "Connected to server, service network event called.\n";
 
             break;
         case ENET_EVENT_TYPE_RECEIVE:
-            std::cout << "Received data from server.\n";
+			std::cout << "Received packet from server.\n";
+            dispatcher.dispatch(packetType, event.packet, event.peer);
+
+
             enet_packet_destroy(event.packet);
             break;
         case ENET_EVENT_TYPE_DISCONNECT:
@@ -145,10 +116,10 @@ void NetworkManager::generateSteamTicket()
 
 void NetworkManager::sendAuthToServer()
 {
-#ifndef DEDICATED_SERVER
+
     if (!client || authTicket == k_HAuthTicketInvalid || ticketSize == 0)
         return;
-#endif
+
     CSteamID steamID = SteamUser()->GetSteamID();
     uint64 steamID64 = steamID.ConvertToUint64();
 
@@ -164,6 +135,20 @@ void NetworkManager::sendAuthToServer()
     enet_host_flush(client);
 }
 
+void NetworkManager::sendPacket(PacketType type, const void* data, size_t size, uint8_t channel)
+{
+    if (!serverPeer) return;
+
+    ENetPacket* packet = enet_packet_create(nullptr, size + 1, ENET_PACKET_FLAG_RELIABLE);
+    packet->data[0] = static_cast<uint8_t>(type);
+    std::memcpy(packet->data + 1, data, size);
+    enet_peer_send(serverPeer, channel, packet);
+}
+
+uint64_t NetworkManager::getLocalSteamID() const {
+    return localSteamID;
+}
+
 #ifdef DEDICATED_SERVER
 CSteamID NetworkManager::getClientSteamID(ENetPeer* client)
 {
@@ -174,12 +159,12 @@ CSteamID NetworkManager::getClientSteamID(ENetPeer* client)
     }
     else {
         std::cerr << "Client not in auth list, THIS INDICATES THAT THIS IS SERIOUSLY BROKEN.";
+        enet_peer_disconnect(client, 0);
+        
     }
     return CSteamID();
 }
-#endif
 
-#ifdef DEDICATED_SERVER
 bool NetworkManager::startServer(int port) {
     ENetAddress address;
     address.host = ENET_HOST_ANY;
@@ -192,15 +177,90 @@ bool NetworkManager::startServer(int port) {
     }
 
     std::cout << "Server started on port " << port << "\n";
+
+    registerServerEventHandlers();
+
     clientStarted = true;
     return true;
 }
+#endif
 
+void NetworkManager::registerServerEventHandlers() {
+#ifdef DEDICATED_SERVER
+    dispatcher.registerHandler(PACKET_AUTH_TICKET,
+        [this](ENetPacket* packet, ENetPeer* peer) {
+            this->handleAuthTicketPacket(packet, peer);
+        });
+
+
+   // dispatcher.registerHandler(PACKET_INPUT_COMMAND, [this](ENetPacket* packet, ENetPeer* peer) {
+   //    const PlayerInputPacket* input = reinterpret_cast<const PlayerInputPacket*>(packet->data + 1);
+   //         if (packet->dataLength < sizeof(PlayerInputPacket)) {
+   //             std::cerr << "Invalid input packet size\n";
+   //             return;
+   //         }
+
+   //         std::string moveStr;
+   //         if (input->moveX == -1) moveStr += "A";
+   //         if (input->moveX == 1) moveStr += "D";
+
+   //         if (input->moveY == -1) moveStr += "W";
+   //         if (input->moveY == 1) moveStr += "S";
+
+   //         if (moveStr.empty()) moveStr = "None";
+
+			////std::cout << moveStr << "\n\n";
+
+   //         if (inputCallback) {
+   //             inputCallback(*input);
+   //         }
+
+   //     });
+#else
+    dispatcher.registerHandler(PACKET_SERVER_STATE, [this](ENetPacket* packet, ENetPeer* peer) {
+        if (packet->dataLength < sizeof(ServerStatePacket)) {
+            std::cerr << "Invalid server state packet size\n";
+            return;
+        }
+
+        const ServerStatePacket* state = reinterpret_cast<const ServerStatePacket*>(packet->data + 1);
+
+		//std::cout << "New Player X: " << state->posX << "\n New Player Y: " << state->posY << "\n";
+
+        if (serverStateCallback) {
+            serverStateCallback(*state);
+        }
+
+        });
+
+    dispatcher.registerHandler(PACKET_CONNECTED_PLAYER_LIST, [this](ENetPacket* packet, ENetPeer* peer) {
+        if (packet->dataLength < sizeof(ServerStatePacket)) {
+            std::cerr << "Invalid ServerStatePacket size\n";
+            return;
+        }
+
+        const ServerStatePacket* state = reinterpret_cast<const ServerStatePacket*>(packet->data + 1);
+
+        if (onPlayerStateReceived) {
+            onPlayerStateReceived(*state);
+        }
+        });
+
+#endif
+}
+
+
+void NetworkManager::addClientConnection(uint64_t steamID, ENetPeer* peer) {
+
+}
+
+
+#ifdef DEDICATED_SERVER
 bool NetworkManager::initSteamServer()
 {
     const uint32_t IP = 0;
     const uint16_t steamPort = 8766;  // Port for Steam P2P traffic
-    const uint16_t gamePort = 1234;   // Game port for your ENet server
+    const uint16_t gamePort = 1234;   // Game port for ENet server
     const uint16_t queryPort = 27015; // Server browser port
 
     const AppId_t gameAppID = 480;
@@ -210,7 +270,7 @@ bool NetworkManager::initSteamServer()
         gamePort,
         queryPort,
         eServerModeAuthentication,
-        "1.0.0.0"  // Your game version string
+        "1.0.0.0"
     );
 
     if (!success) {
@@ -228,6 +288,66 @@ bool NetworkManager::initSteamServer()
     steamServerStarted = true;
     return true;
 }
+
+void NetworkManager::handleAuthTicketPacket(ENetPacket* packet, ENetPeer* peer) {
+    if (packet->dataLength < 2) return; // useless packet
+
+        const uint8_t* packetData = packet->data;
+        uint64_t steamID64;
+        memcpy(&steamID64, packetData + 1, sizeof(uint64));
+
+        CSteamID steamID(steamID64);
+
+        const uint8_t* ticketData = packetData + 1 + sizeof(uint64);
+        int ticketLen = packet->dataLength - 1 - sizeof(uint64);
+
+        EBeginAuthSessionResult result = SteamGameServer()->BeginAuthSession(
+            ticketData,
+            ticketLen,
+            steamID
+        );
+
+        if (result == k_EBeginAuthSessionResultOK) {
+            std::cout << "Steam auth successful for SteamID: " << steamID64 << "\n";
+            // unfortunately easier to leave in
+            clientSteamIDs[peer] = steamID;
+            //Connection conn;
+            //conn.steamID = steamID.ConvertToUint64();
+            //conn.peer = peer;
+            //connections[conn.steamID] = conn;
+            ENetPacket* packet = enet_packet_create("Hello Client!", strlen("Hello Client!") + 1, ENET_PACKET_FLAG_RELIABLE);
+            if (onPlayerAuthenticated) {
+                onPlayerAuthenticated(steamID.ConvertToUint64(), peer);
+            }
+            enet_peer_send(peer, 0, packet);
+        }
+        else {
+            std::cout << "Steam auth failed: " << static_cast<int>(result) << "\n";
+            enet_peer_disconnect(peer, 0);
+        }
+}
+
+
+void NetworkManager::sendPacketToPeer(PacketType type, const void* data, size_t size, ENetPeer* peer, uint8_t channel)
+{
+    ENetPacket* packet = enet_packet_create(nullptr, size + 1, ENET_PACKET_FLAG_RELIABLE);
+    packet->data[0] = static_cast<uint8_t>(type);
+    std::memcpy(packet->data + 1, data, size);
+    enet_peer_send(peer, channel, packet);
+}
+
+
+void NetworkManager::broadcastToAllExcept(PacketType type, const void* data, size_t size, ENetPeer* exclude, uint8_t channel)
+{
+    for (const auto& [peer, steamID] : clientSteamIDs)
+    {
+        if (peer == exclude)
+            continue;
+
+        sendPacketToPeer(type, data, size, peer, channel);
+    }
+}
+
 #else
 bool NetworkManager::startClient(const std::string& address, int port) {
     ENetAddress enetAddress;
@@ -250,8 +370,13 @@ bool NetworkManager::startClient(const std::string& address, int port) {
     if (enet_host_service(client, &event, 5000) > 0 && event.type == ENET_EVENT_TYPE_CONNECT) {
         std::cout << "Successfully connected to server!" << std::endl;
         clientStarted = true;
+        // note that if the client connects but doesn't send these, they will simply remain connected to the server without being authenticated
+        // note this should be patched or the client shouldn't be able to proceed until authentication is requested
+        // e.g. connect to login server, authorize, then proceed, meaning these methods may need to be moved to a button
         generateSteamTicket();
         sendAuthToServer();
+        localSteamID = SteamUser()->GetSteamID().ConvertToUint64();
+        registerServerEventHandlers();
         return true;
     }
     else {
@@ -260,4 +385,9 @@ bool NetworkManager::startClient(const std::string& address, int port) {
         return false;
     }
 }
+
+void NetworkManager::setServerStateCallback(std::function<void(const ServerStatePacket&)> callback) {
+    serverStateCallback = std::move(callback);
+}
+
 #endif
