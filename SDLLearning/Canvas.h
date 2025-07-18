@@ -6,7 +6,7 @@
 class Canvas {
 public:
     Canvas(SDL_Renderer* renderer);
-    Canvas() { }
+    //Canvas() { }
     ~Canvas();
 
     void draw();

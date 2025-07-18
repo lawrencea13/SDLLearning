@@ -11,9 +11,10 @@ void Player::Update() {
 #ifndef DEDICATED_SERVER
 	xchange = 0;
 	ychange = 0;
+	uint32_t currentFrame = gameInstance.getFrameCount();
 
 	if (isLocalPlayer && input) {
-		sendInput(0);
+		sendInput(currentFrame);
 	}
 	//last frame x/y change
 	lf_xchange = xchange;
@@ -42,6 +43,8 @@ void Player::Update() {
 	
 	destRect.x += xchange;
 	destRect.y += ychange;
+
+	storeState(currentFrame);
 #endif
 }
 
@@ -57,18 +60,7 @@ void Player::Render() {
 #ifdef DEDICATED_SERVER
 void Player::ApplyInput(const PlayerInputPacket& input)
 {
-	// reset on new packet
-	xchange = 0;
-	ychange = 0;
 
-	if (input.moveX == -1) xchange -= 10;
-	if (input.moveX == 1)  xchange += 10;
-
-	if (input.moveY == -1) ychange -= 10;
-	if (input.moveY == 1)  ychange += 10;
-
-	destRect.x += xchange;
-	destRect.y += ychange;
 }
 #else
 void Player::ApplyServerState(const ServerStatePacket& packet)
@@ -79,19 +71,31 @@ void Player::ApplyServerState(const ServerStatePacket& packet)
 
 void Player::sendInput(uint32_t currentFrame)
 {
-	PlayerInputPacket packet;
-	NetworkManager& net = gameInstance.getNetworkManager();
-	packet.steamID = net.getLocalSteamID();
-	packet.moveX = input->isKeyDown(SDLK_a) ? -1 : input->isKeyDown(SDLK_d) ? 1 : 0;
-	packet.moveY = input->isKeyDown(SDLK_w) ? -1 : input->isKeyDown(SDLK_s) ? 1 : 0;
-	packet.attack = input->isMouseButtonDown(SDL_BUTTON_LEFT);
-	packet.clientInputFrame = currentFrame;
+	if (!input) return;
 
-	net.sendPacket(PACKET_INPUT_COMMAND, &packet, sizeof(packet));
+	PlayerInputPacket pkt{};
+	if (input->isKeyDown(SDLK_a)) pkt.moveX = -1;
+	else if (input->isKeyDown(SDLK_d)) pkt.moveX = +1;
+	else                                pkt.moveX = 0;
+
+	if (input->isKeyDown(SDLK_w)) pkt.moveY = -1;
+	else if (input->isKeyDown(SDLK_s)) pkt.moveY = +1;
+	else                                pkt.moveY = 0;
+
+	pkt.attack = input->isMouseButtonDown(SDL_BUTTON_LEFT);
+
+	pkt.clientInputFrame = currentFrame;
+
+	gameInstance.getNetworkManager()
+		.sendPacket(PACKET_INPUT_COMMAND, &pkt, sizeof(pkt), 0);
 }
 
 void Player::storeState(uint32_t frame)
 {
+	if (stateHistory.size() >= MAX_HISTORY_SIZE) {
+		stateHistory.pop_front();
+	}
+
 	PlayerState state;
 	state.x = destRect.x;
 	state.y = destRect.y;
@@ -99,24 +103,20 @@ void Player::storeState(uint32_t frame)
 	state.ychange = ychange;
 	state.frame = frame;
 	stateHistory.push_back(state);
-	if (stateHistory.size() > MAX_HISTORY_SIZE) {
-		stateHistory.pop_front();
-	}
 }
 
 PlayerState Player::getStateAtFrame(uint32_t frame) const
 {
 	if (stateHistory.empty()) {
-		// Handle the case where there's no history (e.g., at the very beginning)
 		PlayerState defaultState = { destRect.x, destRect.y, 0, 0, frame };
 		return defaultState;
 	}
 
-	// Find the closest state *before* the given frame
 	auto closest = std::min_element(stateHistory.begin(), stateHistory.end(),
 		[frame](const PlayerState& a, const PlayerState& b) {
-			return std::abs(static_cast<int>(a.frame - frame)) < std::abs(static_cast<int>(b.frame - frame));
+			return std::abs(static_cast<int>(a.frame - frame))
+				< std::abs(static_cast<int>(b.frame - frame));
 		});
 
-	return *closest; // Return the closest state
+	return *closest;
 }

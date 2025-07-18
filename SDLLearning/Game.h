@@ -46,6 +46,14 @@ public:
 	NetworkManager& getNetworkManager() { return networkManager; }
 	std::shared_ptr<PlayerManager> getPlayerManager() const { return playerManager; }
 
+
+	// frametime info
+	float deltaTime = 0.0f;
+	float accumulator = 0.0f;
+	float getDeltaTime() { return deltaTime; }
+	uint32_t getFrameCount() const { return frameCount; }
+	void tick(float fixedDeltaTime);
+
 private:
 	bool isRunning;
 	SDL_Window* window;
@@ -60,4 +68,7 @@ private:
 
 	void handlePlayerInput(const PlayerInputPacket& input);
 	void receiveServerStateUpdate(const ServerStatePacket& state);
+
+	uint32_t frameCount = 0;
+
 };

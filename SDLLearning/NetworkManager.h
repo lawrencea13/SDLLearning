@@ -36,8 +36,9 @@ public:
 
 #ifdef DEDICATED_SERVER
     std::function<void(uint64_t steamID, ENetPeer* peer)> onPlayerAuthenticated;
-    std::function<void(const PlayerInputPacket&)> onPlayerInputPacketReceived;
+    std::function<void(uint64_t steamID, const PlayerInputPacket&)> inputCallback;
 #else
+    // names aren't great here..1 is for initial connect, other is for updates after the fact.
     std::function<void(const ServerStatePacket&)> serverStateCallback;
     std::function<void(const ServerStatePacket&)> onPlayerStateReceived;
 #endif

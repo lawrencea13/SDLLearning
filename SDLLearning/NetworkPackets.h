@@ -17,7 +17,6 @@ struct ServerStatePacket {
 };
 
 struct PlayerInputPacket {
-    uint64_t steamID;
     int8_t moveX;  // -1 = left, 0 = idle, 1 = right
     int8_t moveY;  // -1 = up, 0 = none, 1 = down
     bool attack;

@@ -28,12 +28,16 @@ public:
 	bool setIsLocalPlayer(bool local) { isLocalPlayer = local; return isLocalPlayer; }
 
 #ifdef DEDICATED_SERVER
-	uint64_t setSteamID(uint64_t id) { steamID = id; return steamID; }
+	
     void ApplyInput(const PlayerInputPacket& input);
 #else
     void ApplyServerState(const ServerStatePacket& packet);
 #endif
+    uint64_t setSteamID(uint64_t id) { steamID = id; return steamID; }
 	uint64_t getSteamID() const { return steamID; }
+
+    void storeState(uint32_t frame);
+    PlayerState getStateAtFrame(uint32_t frame) const;
 
 
 private:
@@ -43,8 +47,7 @@ private:
     bool isLocalPlayer = false;
 
     std::deque<PlayerState> stateHistory;
-	const size_t MAX_HISTORY_SIZE = 60; // later to pull from FPS. Framecount, so it divided by FPS = length(60 history size / 60 fps = 1 second)
+    static constexpr size_t MAX_HISTORY_SIZE = 128; // later to pull from FPS. Framecount, so it divided by FPS = length(60 history size / 60 fps = 1 second)
 
-    void storeState(uint32_t frame);
-    PlayerState getStateAtFrame(uint32_t frame) const;
+
 };

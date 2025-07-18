@@ -7,7 +7,7 @@ class GameObject;
 
 SDL_Event Game::event;
 
-Game::Game() : isRunning(false), renderer(nullptr), textureManager(nullptr), window(nullptr), camera(0,0,1920,1080) {
+Game::Game() : isRunning(false), renderer(nullptr), textureManager(nullptr), window(nullptr), camera(0,0,1920,1080), fontManager(nullptr) {
 	
 }
 Game::~Game() {
@@ -45,7 +45,13 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, in
 		this->handleNewPlayerConnection(steamID, peer);
 		};
 
-	return; // Skip SDL and rendering init
+	networkManager.inputCallback = [this](uint64_t steamID, const PlayerInputPacket& input) {
+		auto p = playerManager->GetPlayer(steamID);
+		if (!p) return;
+		p->ApplyInput(input);
+		};
+
+	return; // Skip SDL and rendering initialization
 #else
 	SteamLogin();
 	if (!networkManager.startClient("127.0.0.1", 1234)) {
@@ -336,6 +342,32 @@ void Game::clientHandleInitialConnect(const ServerStatePacket& state)
 		camera.setFollowBounds(SDL_Rect{ 200,200 });
 		camera.setViewportSize(1280, 720);
 	}*/
+	std::shared_ptr<SDL_Texture> texture = textureManager->getTexture("Assets\\testSprite.png");
+	if (state.steamID == networkManager.getLocalSteamID()) {
+		auto player = playerManager->CreatePlayer(
+			state.steamID,
+			static_cast<int>(state.posX),
+			static_cast<int>(state.posY),
+			64, 64,
+			texture,
+			*this
+		);
+		player->setSteamID(state.steamID);
+		setLocalPlayer(player);
+	}
+	else {
+		auto player = playerManager->CreatePlayer(
+			state.steamID,
+			static_cast<int>(state.posX),
+			static_cast<int>(state.posY),
+			64, 64,
+			texture,
+			*this
+		);
+		player->setSteamID(state.steamID);
+	}
+
+
 }
 
 bool Game::onGameObjectCreated(GameObject* obj)
@@ -348,6 +380,25 @@ bool Game::registerGameObject(GameObject* obj)
 	registry.registerObject(obj);
 	std::cout << "GameObject Registered" << std::endl;
 	return true;
+}
+
+void Game::tick(float fixedDeltaTime)
+{
+#ifdef DEDICATED_SERVER
+	while (accumulator >= fixedDeltaTime) {
+		update();
+		frameCount++;
+		accumulator -= fixedDeltaTime;
+	}
+#else
+	handleEvents(); // Input
+	while (accumulator >= fixedDeltaTime) {
+		update();
+		frameCount++;
+		accumulator -= fixedDeltaTime;
+	}
+	render();
+#endif
 }
 
 void Game::receiveServerStateUpdate(const ServerStatePacket& state)

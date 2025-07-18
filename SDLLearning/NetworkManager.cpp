@@ -193,29 +193,29 @@ void NetworkManager::registerServerEventHandlers() {
         });
 
 
-   // dispatcher.registerHandler(PACKET_INPUT_COMMAND, [this](ENetPacket* packet, ENetPeer* peer) {
-   //    const PlayerInputPacket* input = reinterpret_cast<const PlayerInputPacket*>(packet->data + 1);
-   //         if (packet->dataLength < sizeof(PlayerInputPacket)) {
-   //             std::cerr << "Invalid input packet size\n";
-   //             return;
-   //         }
+    dispatcher.registerHandler(
+        PACKET_INPUT_COMMAND,
+        [this](ENetPacket* packet, ENetPeer* peer) {
+            if (!packet || packet->dataLength < sizeof(PlayerInputPacket))
+                return;
 
-   //         std::string moveStr;
-   //         if (input->moveX == -1) moveStr += "A";
-   //         if (input->moveX == 1) moveStr += "D";
+            PlayerInputPacket input{};
+            std::memcpy(&input, packet->data, sizeof(input));
 
-   //         if (input->moveY == -1) moveStr += "W";
-   //         if (input->moveY == 1) moveStr += "S";
+            auto it = clientSteamIDs.find(peer);
+            if (it == clientSteamIDs.end()) {
+                // not authed, fuck off goober
+				enet_peer_disconnect(peer, 0);
+                return;
+            }
+            uint64_t steamID = it->second.ConvertToUint64();
 
-   //         if (moveStr.empty()) moveStr = "None";
+            if (inputCallback) {
+                inputCallback(steamID, input);
+            }
+        }
+    );
 
-			////std::cout << moveStr << "\n\n";
-
-   //         if (inputCallback) {
-   //             inputCallback(*input);
-   //         }
-
-   //     });
 #else
     dispatcher.registerHandler(PACKET_SERVER_STATE, [this](ENetPacket* packet, ENetPeer* peer) {
         if (packet->dataLength < sizeof(ServerStatePacket)) {
@@ -239,10 +239,13 @@ void NetworkManager::registerServerEventHandlers() {
             return;
         }
 
-        const ServerStatePacket* state = reinterpret_cast<const ServerStatePacket*>(packet->data + 1);
+        size_t count = packet->dataLength / sizeof(ServerStatePacket);
+        for (size_t i = 0; i < count; ++i) {
+            ServerStatePacket state{};
+            std::memcpy(&state, packet->data + i * sizeof(ServerStatePacket), sizeof(ServerStatePacket));
 
-        if (onPlayerStateReceived) {
-            onPlayerStateReceived(*state);
+            if (onPlayerStateReceived)
+                onPlayerStateReceived(state);
         }
         });
 
