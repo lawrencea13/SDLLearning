@@ -14,6 +14,7 @@ struct ServerStatePacket {
     uint64_t steamID;
     float posX;
     float posY;
+    uint32_t inputFrame;
 };
 
 struct PlayerInputPacket {

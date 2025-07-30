@@ -16,8 +16,13 @@ public:
 
     void dispatch(uint8_t packetType, ENetPacket* packet, ENetPeer* peer) const {
         auto it = handlers.find(packetType);
+
         if (it != handlers.end()) {
-            it->second(packet, peer);
+            ENetPacket packetView = *packet;
+            packetView.data += 1;
+            packetView.dataLength -= 1;
+
+            it->second(&packetView, peer);
         }
     }
 

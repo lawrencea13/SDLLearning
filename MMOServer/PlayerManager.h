@@ -18,7 +18,6 @@ public:
 
 
     void RegisterPacketHandlers(PacketDispatcher& dispatcher) {
-#ifdef DEDICATED_SERVER
         dispatcher.registerHandler(PACKET_INPUT_COMMAND, [this](ENetPacket* packet, ENetPeer* peer) {
             if (!packet || packet->dataLength < sizeof(PlayerInputPacket))
                 return;
@@ -28,20 +27,10 @@ public:
 
             HandlePlayerInput(inputPacket);
             });
-#else
-        dispatcher.registerHandler(PACKET_SERVER_STATE, [this](ENetPacket* packet, ENetPeer* peer) {
-            if (!packet || packet->dataLength < sizeof(ServerStatePacket))
-                return;
 
-            ServerStatePacket serverState;
-            std::memcpy(&serverState, packet->data, sizeof(ServerStatePacket));
-
-            HandleServerState(serverState);
-            });
-#endif
     }
 
-    std::shared_ptr<Player> CreatePlayer(uint64_t steamID, int x, int y, int w, int h, std::shared_ptr<SDL_Texture> tex, Game& game) {
+    std::shared_ptr<Player> CreatePlayer(uint64_t steamID, int x, int y, int w, int h, Game& game) {
         if (players.find(steamID) != players.end()) {
             // TODO: log a warning if a player with this SteamID already exists
 			// if a player exists and we're calling create player, it means something went wrong
@@ -49,7 +38,7 @@ public:
             return players[steamID];
         }
 
-        auto player = std::make_shared<Player>(x, y, w, h, tex, game);
+        auto player = std::make_shared<Player>(x, y, w, h, game);
         players[steamID] = player;
         return player;
     }
@@ -66,6 +55,7 @@ public:
     std::shared_ptr<Player> GetPlayer(PlayerID id) const {
         auto it = players.find(id);
         if (it != players.end()) return it->second;
+		std::cout << "Warning: Attempted to get a player with SteamID: " << id << ", but none exists." << std::endl;
         return nullptr;
     }
 
@@ -77,20 +67,11 @@ public:
 private:
     std::unordered_map<PlayerID, std::shared_ptr<Player>> players;
 
-#ifdef DEDICATED_SERVER
     void HandlePlayerInput(const PlayerInputPacket& packet) {
 
-        auto player = GetPlayer(packet.steamID);
-        if (!player) return;
 
-        player->ApplyInput(packet);
+		// TODO: Implement HandlePlayerInput
+        
     }
-#else
-    void HandleServerState(const ServerStatePacket& packet) {
-        auto player = GetPlayer(packet.steamID);
-        if (!player) return;
 
-		player->ApplyServerState(packet);
-    }
-#endif
 };

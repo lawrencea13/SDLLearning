@@ -2,14 +2,14 @@
 
 #include <tuple>
 #include <vector>
-#include "SDL.h"
 #include <memory>
+#include "Rect.h"
 
 class Game;
 
 class GameObject {
 public:
-	GameObject(int x, int y, int w, int h, std::shared_ptr<SDL_Texture> tex, Game& game);
+	GameObject(int x, int y, int w, int h, Game& game);
 
 	virtual ~GameObject() {}
 
@@ -29,22 +29,18 @@ public:
 	}
 
 	// probably the only thing that's necessary but I will leave location, dimensions and the full rect available.
-	SDL_Rect& getRect() {
+	Rect& getRect() {
 		return destRect;
 	}
 
 	virtual void Update();
-	virtual void Render();
 	virtual void Collided(GameObject* obj);
 
 	
-	bool checkExternalCollision(const SDL_Rect& otherRect) const;
+	bool checkExternalCollision(const Rect& otherRect) const;
 
 
 protected:
-
-
-	// NOTE: WALL TYPES SHOULD BE NO LARGER THAN 1270x1270
 
 	Game& gameInstance;
 	
@@ -61,11 +57,7 @@ protected:
 	int lf_xchange;
 	int lf_ychange;
 
-	SDL_Rect srcRect, destRect;
-	//SDL_Texture* objTexture;
-	std::shared_ptr<SDL_Texture> texture;
-	SDL_Renderer* renderer = nullptr;
-	SDL_Color* color;
+	Rect srcRect, destRect;
 
 	bool gravityEnabled = false;
 	bool collisionEnabled = false;
@@ -81,7 +73,7 @@ protected:
 	const double cullDistance = 16000000;
 
 private:
-	bool checkInternalCollision(SDL_Rect* myRect, SDL_Rect* otherRect);
+	bool checkInternalCollision(Rect* myRect, Rect* otherRect);
 	int sign(int value);
 
 };

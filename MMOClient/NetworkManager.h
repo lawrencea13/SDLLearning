@@ -34,38 +34,15 @@ public:
 
     PacketDispatcher& getDispatcher() { return dispatcher; }
 
-#ifdef DEDICATED_SERVER
-    std::function<void(uint64_t steamID, ENetPeer* peer)> onPlayerAuthenticated;
-    std::function<void(uint64_t steamID, const PlayerInputPacket&)> inputCallback;
-#else
-    // names aren't great here..1 is for initial connect, other is for updates after the fact.
+	
     std::function<void(const ServerStatePacket&)> serverStateCallback;
     std::function<void(const ServerStatePacket&)> onPlayerStateReceived;
-#endif
+    std::function<void(const ServerStatePacket&)> otherPlayerConnected;
 
-#ifdef DEDICATED_SERVER
-    bool startServer(int port = 1234);
-    bool initSteamServer();
-    bool isSteamServerStarted() const { return steamServerStarted; }
-    
-    void sendPacketToPeer(PacketType type, const void* data, size_t size, ENetPeer* peer, uint8_t channel);
-
-    
-    void broadcastToAllExcept(PacketType type, const void* data, size_t size, ENetPeer* exclude, uint8_t channel);
-#else
     bool startClient(const std::string& host, int port = 1234);
-    void setServerStateCallback(std::function<void(const ServerStatePacket&)> callback);
-#endif
+
 
 private:
-#ifdef DEDICATED_SERVER
-    ENetHost* server = nullptr;
-    bool steamServerStarted = false;
-    std::unordered_map<ENetPeer*, CSteamID> clientSteamIDs;
-
-    void handleAuthTicketPacket(ENetPacket* packet, ENetPeer* peer);
-    
-#endif
     ENetPeer* serverPeer = nullptr;
     ENetHost* client = nullptr;
     bool clientStarted = false;

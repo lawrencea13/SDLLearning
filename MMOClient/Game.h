@@ -26,7 +26,6 @@ public:
 	void render();
 	void clean();
 	void SteamLogin();
-	void handleNewPlayerConnection(uint64_t steamID, ENetPeer* peer);
 	void clientHandleInitialConnect(const ServerStatePacket& state);
 	std::shared_ptr<Player> getLocalPlayer() { return localPlayer.lock(); }
 	void setLocalPlayer(std::shared_ptr<Player> player) { localPlayer = player; }
@@ -66,8 +65,8 @@ private:
 	std::weak_ptr<Player> localPlayer;
 	std::shared_ptr<PlayerManager> playerManager;
 
-	void handlePlayerInput(const PlayerInputPacket& input);
 	void receiveServerStateUpdate(const ServerStatePacket& state);
+	void otherPlayerConnected(const ServerStatePacket& state);
 
 	uint32_t frameCount = 0;
 

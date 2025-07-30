@@ -5,37 +5,22 @@
 
 void GameObject::Update() {}
 
-void GameObject::Render() {
-	// render examples //
-	// SDL_RenderCopy(renderer, objTexture, &srcRect, &destRect);
-
-	//SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-	//SDL_RenderFillRect(renderer, &destRect);
-
-}
 
 void GameObject::Collided(GameObject* obj) {
 	// to be implemented by objects that want to do something when colliding with another object, e.g. do damage to that object
 }
 
 
-bool GameObject::checkExternalCollision(const SDL_Rect& otherRect) const {
-	if (destRect.x < otherRect.x + otherRect.w &&
-		destRect.x + destRect.w > otherRect.x &&
-		destRect.y < otherRect.y + otherRect.h &&
-		destRect.y + destRect.h > otherRect.y) {
-		return true; // Collision detected
-	}
-	return false; // No collision
+bool GameObject::checkExternalCollision(const Rect& otherRect) const {
+	return destRect.intersects(otherRect);
 }
 
-GameObject::GameObject(int x, int y, int w, int h, std::shared_ptr<SDL_Texture> tex, Game& game) : gameInstance(game), renderer(game.getRenderer())
+GameObject::GameObject(int x, int y, int w, int h, Game& game) : gameInstance(game)
 {
 	destRect.x = x;
 	destRect.y = y;
 	destRect.w = w;
 	destRect.h = h;
-	texture = tex;
 	std::cout << "Created new game object" << std::endl;
 	game.onGameObjectCreated(this);
 }
@@ -48,22 +33,20 @@ void GameObject::handleCollision() {
 		std::cout << "You called GameObject::handleCollision but did not enable collision." << std::endl;
 		return;
 	}
-	//else if (!registry) {
-	//	std::cout << "Collision is enabled, but you did not instantiate this GameObject with an ObjectRegistry." << std::endl;
-	//	std::cout << "As a result, there is nothing to collide with." << std::endl;
-	//	return;
-	//}
 
+
+	// Old logic
+	/*
+	*
 	SDL_Rect x_Rect{ destRect.x + xchange, destRect.y, destRect.w, destRect.h };
 	SDL_Rect y_Rect{ destRect.x, destRect.y + ychange, destRect.w, destRect.h };
-	
+
 	std::vector<GameObject*> objects = gameInstance.registry.getObjects();
-	
 
 	for (GameObject* obj : objects) {
 		// make sure obj still valid, make sure the obj is not this obj
 		// make sure obj collision is enabled
-		if (obj && obj != this && obj->collisionEnabled) {  
+		if (obj && obj != this && obj->collisionEnabled) {
 
 			SDL_Rect* otherRect = &(obj->getRect());
 
@@ -73,7 +56,7 @@ void GameObject::handleCollision() {
 			double distSquared = (xdist + ydist) * (xdist + ydist);
 
 			//std::cout << distSquared << std::endl;
-			std::cout << std::fixed << distSquared << std::endl;
+			//std::cout << std::fixed << distSquared << std::endl;
 
 			if (distSquared > cullDistance) {
 				continue;
@@ -100,17 +83,36 @@ void GameObject::handleCollision() {
 
 		}
 	}
+	*/
 
+	destRect.x += xchange;
+	for (GameObject* obj : gameInstance.registry.getObjects()) {
+		if (obj && obj != this && obj->collisionEnabled) {
+			if (checkInternalCollision(&destRect, &(obj->getRect()))) {
+				// Collided in X, move back
+				destRect.x -= xchange;
+				xchange = 0;
+				break;
+			}
+		}
+	}
+
+	// Move Y
+	destRect.y += ychange;
+	for (GameObject* obj : gameInstance.registry.getObjects()) {
+		if (obj && obj != this && obj->collisionEnabled) {
+			if (checkInternalCollision(&destRect, &(obj->getRect()))) {
+				// Collided in Y, move back
+				destRect.y -= ychange;
+				ychange = 0;
+				break;
+			}
+		}
+	}
 }
 
-bool GameObject::checkInternalCollision(SDL_Rect* myRect, SDL_Rect* otherRect) {
-	if (myRect->x < otherRect->x + otherRect->w &&
-		myRect->x + myRect->w > otherRect->x &&
-		myRect->y < otherRect->y + otherRect->h &&
-		myRect->y + myRect->h > otherRect->y) {
-		return true; // Collision detected
-	}
-	return false; // No collision
+bool GameObject::checkInternalCollision(Rect* myRect, Rect* otherRect) {
+	return myRect->intersects(*otherRect);
 }
 
 int GameObject::sign(int value) {

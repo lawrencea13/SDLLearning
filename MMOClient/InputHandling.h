@@ -3,11 +3,13 @@
 #include <SDL.h>
 #include <unordered_map>
 #include <string>
+#include <iostream>
 
 class InputHandler {
 
 public:
     void update(SDL_Event* event) {
+		
         if (event->type == SDL_KEYDOWN) {
             keysDown[event->key.keysym.sym] = true;
         }

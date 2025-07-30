@@ -69,7 +69,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{1c3d62dc-18d0-4ffa-a30c-4f2910d76228}</ProjectGuid>
+    <ProjectGuid>{1E5D86ED-E3D9-425C-92D2-D5F0AD87A908}</ProjectGuid>
     <RootNamespace>SDLLearning</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -376,13 +376,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\SDL2_image\include;E:\SDL2\include;E:\ENet\include;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>G:\repos\SDLLearning\steamworks_sdk\public;E:\ENet\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\SDL2_image\lib\x64;E:\SDL2\lib\x64;E:\ENet\lib;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\redistributable_bin\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>G:\repos\SDLLearning\steamworks_sdk\redistributable_bin\win64;E:\ENet\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;enet64.lib;ws2_32.lib;winmm.lib;steam_api64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -392,13 +392,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\SDL2_image\include;E:\SDL2\include;E:\ENet\include;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>G:\repos\SDLLearning\steamworks_sdk\public;E:\ENet\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\SDL2_image\lib\x64;E:\SDL2\lib\x64;E:\ENet\lib;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\redistributable_bin\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>G:\repos\SDLLearning\steamworks_sdk\redistributable_bin\win64;E:\ENet\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;enet64.lib;ws2_32.lib;winmm.lib;steam_api64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -408,13 +409,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>DEDICATED_SERVER;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\SDL2_image\include;E:\SDL2\include;E:\ENet\include;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>G:\repos\SDLLearning\steamworks_sdk\public;E:\ENet\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\SDL2_image\lib\x64;E:\SDL2\lib\x64;E:\ENet\lib;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\redistributable_bin\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>G:\repos\SDLLearning\steamworks_sdk\redistributable_bin\win64;E:\ENet\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;enet64.lib;ws2_32.lib;winmm.lib;steam_api64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -424,13 +425,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\SDL2_image\include;E:\SDL2\include;E:\ENet\include;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>G:\repos\SDLLearning\steamworks_sdk\public;E:\ENet\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\SDL2_image\lib\x64;E:\SDL2\lib\x64;E:\ENet\lib;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\redistributable_bin\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>G:\repos\SDLLearning\steamworks_sdk\redistributable_bin\win64;E:\ENet\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;enet64.lib;ws2_32.lib;winmm.lib;steam_api64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -440,13 +441,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\SDL2_image\include;E:\SDL2\include;E:\ENet\include;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>G:\repos\SDLLearning\steamworks_sdk\public;E:\ENet\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\SDL2_image\lib\x64;E:\SDL2\lib\x64;E:\ENet\lib;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\redistributable_bin\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>G:\repos\SDLLearning\steamworks_sdk\redistributable_bin\win64;E:\ENet\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;enet64.lib;ws2_32.lib;winmm.lib;steam_api64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -458,7 +459,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\SDL2_image\include;E:\SDL2\include;E:\ENet\include;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>G:\repos\SDLLearning\steamworks_sdk\public;E:\ENet\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -466,7 +467,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\SDL2_image\lib\x64;E:\SDL2\lib\x64;E:\ENet\lib;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\redistributable_bin\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>G:\repos\SDLLearning\steamworks_sdk\redistributable_bin\win64;E:\ENet\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;enet64.lib;ws2_32.lib;winmm.lib;steam_api64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -478,7 +479,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\SDL2_image\include;E:\SDL2\include;E:\ENet\include;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>G:\repos\SDLLearning\steamworks_sdk\public;E:\ENet\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -486,7 +487,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\SDL2_image\lib\x64;E:\SDL2\lib\x64;E:\ENet\lib;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\redistributable_bin\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>G:\repos\SDLLearning\steamworks_sdk\redistributable_bin\win64;E:\ENet\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;enet64.lib;ws2_32.lib;winmm.lib;steam_api64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -498,7 +499,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>DEDICATED_SERVER;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\SDL2_image\include;E:\SDL2\include;E:\ENet\include;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>G:\repos\SDLLearning\steamworks_sdk\public;E:\ENet\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -506,47 +507,39 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\SDL2_image\lib\x64;E:\SDL2\lib\x64;E:\ENet\lib;G:\repos\SDLLearning\SDLLearning\steamworks_sdk\redistributable_bin\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>G:\repos\SDLLearning\steamworks_sdk\redistributable_bin\win64;E:\ENet\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;enet64.lib;ws2_32.lib;winmm.lib;steam_api64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Button.cpp" />
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Canvas.cpp" />
-    <ClCompile Include="FontManager.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NetworkManager.cpp" />
     <ClCompile Include="ObjectRegistry.cpp" />
     <ClCompile Include="Player.cpp" />
-    <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Wall.cpp" />
-    <ClCompile Include="Widget.cpp" />
     <ClInclude Include="PlayerManager.h" />
-    <ClInclude Include="Widget.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Button.h" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="Canvas.h" />
-    <ClInclude Include="FontManager.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameConstants.h" />
     <ClInclude Include="GameObject.h" />
-    <ClInclude Include="InputHandling.h" />
     <ClInclude Include="LevelLoader.h" />
     <ClInclude Include="NetworkManager.h" />
     <ClInclude Include="NetworkPackets.h" />
     <ClInclude Include="ObjectRegistry.h" />
     <ClInclude Include="PacketDispatcher.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="TextureManager.h" />
+    <ClInclude Include="Rect.h" />
     <ClInclude Include="Wall.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="libpng16-16.dll" />
     <None Include="packages.config" />
+    <None Include="SDL2.dll" />
+    <None Include="SDL2_image.dll" />
+    <None Include="zlib1.dll" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
