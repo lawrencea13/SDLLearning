@@ -1,7 +1,18 @@
 #include "Game.h"
 #include "Player.h"
+#include "Logger.h"
+
+#define LOG(...) Logger::Log(__VA_ARGS__)
 
 class GameObject;
+
+
+inline static double NowSeconds() {
+	using namespace std::chrono;
+	static auto start = steady_clock::now();
+	return duration<double>(steady_clock::now() - start).count();
+}
+
 
 Game::Game() : isRunning(false) {
 	
@@ -176,7 +187,6 @@ void Game::broadcastPlayerStates() {
 
 	for (const auto& [steamID, playerPtr] : playerManager->GetAllPlayers()) {
 		if (!playerPtr) continue;
-
 		ServerStatePacket state;
 		state.steamID = steamID;
 		state.posX = static_cast<float>(playerPtr->getLocation().x);
@@ -190,10 +200,12 @@ void Game::broadcastPlayerStates() {
 			PACKET_SERVER_STATE,
 			allStates.data(),
 			allStates.size() * sizeof(ServerStatePacket),
-			0
+			0,
+			ENET_PACKET_FLAG_UNSEQUENCED
 		);
 	}
 }
+
 
 
 bool Game::onGameObjectCreated(GameObject* obj)
@@ -211,11 +223,11 @@ bool Game::registerGameObject(GameObject* obj)
 
 void Game::tick(float fixedDeltaTime)
 {
-	while (accumulator >= fixedDeltaTime) {
-		update();
-		frameCount++;
-		accumulator -= fixedDeltaTime;
-	}
+	//static uint64_t tickNum = 0;
+	//LOG("[SERVER] Tick: %llu at %.3f", ++tickNum, NowSeconds());
+	update();
+	frameCount++;
+	enet_host_flush(networkManager.getServer());
 }
 
 

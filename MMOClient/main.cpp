@@ -2,11 +2,12 @@
 #include "SDL_ttf.h"
 #include <chrono>
 #include <thread>
+#include "Logger.h"
 
 
 int main(int argc, char *argv[]) {
 
-    
+    Logger::Init("client_log.txt");
 
     using Clock = std::chrono::high_resolution_clock;
     using Duration = std::chrono::duration<double>;
@@ -87,6 +88,7 @@ int main(int argc, char *argv[]) {
     */
 
     game.clean();
+    Logger::Shutdown();
     return 0;
 
 }

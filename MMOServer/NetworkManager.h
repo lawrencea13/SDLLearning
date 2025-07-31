@@ -41,13 +41,15 @@ public:
     bool startServer(int port = 1234);
     bool initSteamServer();
     bool isSteamServerStarted() const { return steamServerStarted; }
+
+	ENetHost* getServer() const { return server; }
     
-    void sendPacketToPeer(PacketType type, const void* data, size_t size, ENetPeer* peer, uint8_t channel);
+    void sendPacketToPeer(PacketType type, const void* data, size_t size, ENetPeer* peer, uint8_t channel, uint32_t flags = 1);
 
     
-    void broadcastToAllExcept(PacketType type, const void* data, size_t size, ENetPeer* exclude, uint8_t channel);
+    void broadcastToAllExcept(PacketType type, const void* data, size_t size, ENetPeer* exclude, uint8_t channel, uint32_t flags = 1);
 
-    void broadcastToAll(PacketType type, const void* data, size_t size, uint8_t channel);
+    void broadcastToAll(PacketType type, const void* data, size_t size, uint8_t channel, uint32_t flags = 1);
 
 
 private:

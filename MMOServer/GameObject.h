@@ -50,8 +50,8 @@ protected:
 	int ypos;
 
 	// change in position this frame only, reset each frame
-	int xchange;
-	int ychange;
+	float xchange;
+	float ychange;
 
 	// change in position from last frame, store in case we need to calculate acceleration or deceleration for advanced movement
 	int lf_xchange;

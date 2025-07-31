@@ -34,6 +34,6 @@ private:
     uint32_t s_lastReceivedFrame = 0;
     int speed = 300;
 
-    int s_xchange = 0;
-    int s_ychange = 0;
+    float s_xchange = 0;
+    float s_ychange = 0;
 };

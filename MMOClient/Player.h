@@ -86,5 +86,7 @@ private:
     // how far behind real time we render (in seconds)
     static constexpr double INTERP_DELAY = 0.1;
     float drawX = 0.0f, drawY = 0.0f;
+    float posX = 0.0f;
+    float posY = 0.0f;
 
 };

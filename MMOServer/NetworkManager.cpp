@@ -240,16 +240,16 @@ int NetworkManager::handlePeerDisconnect(ENetPeer* peer)
 }
 
 
-void NetworkManager::sendPacketToPeer(PacketType type, const void* data, size_t size, ENetPeer* peer, uint8_t channel)
+void NetworkManager::sendPacketToPeer(PacketType type, const void* data, size_t size, ENetPeer* peer, uint8_t channel, uint32_t flags)
 {
-    ENetPacket* packet = enet_packet_create(nullptr, size + 1, ENET_PACKET_FLAG_RELIABLE);
+    ENetPacket* packet = enet_packet_create(nullptr, size + 1, flags);
     packet->data[0] = static_cast<uint8_t>(type);
     std::memcpy(packet->data + 1, data, size);
     enet_peer_send(peer, channel, packet);
 }
 
 
-void NetworkManager::broadcastToAllExcept(PacketType type, const void* data, size_t size, ENetPeer* exclude, uint8_t channel)
+void NetworkManager::broadcastToAllExcept(PacketType type, const void* data, size_t size, ENetPeer* exclude, uint8_t channel, uint32_t flags)
 {
     for (const auto& [peer, steamID] : clientSteamIDs)
     {
@@ -260,7 +260,7 @@ void NetworkManager::broadcastToAllExcept(PacketType type, const void* data, siz
     }
 }
 
-void NetworkManager::broadcastToAll(PacketType type, const void* data, size_t size, uint8_t channel)
+void NetworkManager::broadcastToAll(PacketType type, const void* data, size_t size, uint8_t channel, uint32_t flags)
 {
     for (const auto& [peer, steamID] : clientSteamIDs)
     {

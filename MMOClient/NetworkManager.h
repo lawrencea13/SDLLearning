@@ -24,7 +24,7 @@ public:
 
     void generateSteamTicket();
     void sendAuthToServer();
-    void sendPacket(PacketType type, const void* data, size_t size, uint8_t channel = 0);
+    void sendPacket(PacketType type, const void* data, size_t size, uint8_t channel = 0, uint32_t flags = 1);
 
     void registerServerEventHandlers();
     void addClientConnection(uint64_t steamID, ENetPeer* peer);
@@ -33,7 +33,7 @@ public:
     uint64_t getLocalSteamID() const;
 
     PacketDispatcher& getDispatcher() { return dispatcher; }
-
+    ENetHost* getClient() const { return client; }
 	
     std::function<void(const ServerStatePacket&)> serverStateCallback;
     std::function<void(const ServerStatePacket&)> onPlayerStateReceived;

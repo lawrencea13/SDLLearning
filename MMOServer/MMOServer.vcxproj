@@ -233,6 +233,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>E:\SDL2\include;G:\repos\SDLLearning\packages\nlohmann.json.3.11.2\build\native\include;E:\SDL2_image\include;$(IncludePath)</IncludePath>
     <LibraryPath>E:\SDL2_image\lib\x64;E:\SDL2\lib\x64;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\ServerBuild\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Client Build(DEBUG)|x64'">
     <IncludePath>E:\SDL2\include;G:\repos\SDLLearning\packages\nlohmann.json.3.11.2\build\native\include;E:\SDL2_image\include;$(IncludePath)</IncludePath>
@@ -253,6 +254,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>E:\SDL2\include;G:\repos\SDLLearning\packages\nlohmann.json.3.11.2\build\native\include;E:\SDL2_image\include;$(IncludePath)</IncludePath>
     <LibraryPath>E:\SDL2_image\lib\x64;E:\SDL2\lib\x64;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\ServerBuild\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Client Build(RELEASE)|x64'">
     <IncludePath>E:\SDL2\include;G:\repos\SDLLearning\packages\nlohmann.json.3.11.2\build\native\include;E:\SDL2_image\include;$(IncludePath)</IncludePath>
@@ -519,6 +521,7 @@
     <ClCompile Include="ObjectRegistry.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Wall.cpp" />
+    <ClInclude Include="Logger.h" />
     <ClInclude Include="PlayerManager.h" />
   </ItemGroup>
   <ItemGroup>

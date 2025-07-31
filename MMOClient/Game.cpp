@@ -2,6 +2,9 @@
 #include "Player.h"
 #include "Wall.h"
 #include "Button.h"
+#include "Logger.h"
+
+#define LOG(...) Logger::Log(__VA_ARGS__)
 
 class GameObject;
 
@@ -42,7 +45,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, in
 		this->clientHandleInitialConnect(state);
 		};
 	
-	networkManager.serverStateCallback = [this](const ServerStatePacket& state) {
+	networkManager.serverStateCallback = [this](const ServerStatePacket state) {
 		this->receiveServerStateUpdate(state);
 		};
 
@@ -118,24 +121,28 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, in
 
 
 void Game::handleEvents() {
-	SDL_PollEvent(&event);
-	switch (event.type) {
-	case SDL_QUIT:
-		isRunning = false;
-		break;
-	default:
-		break;
+	//SDL_PollEvent(&event);
+	while (SDL_PollEvent(&event)) {
+		switch (event.type) {
+		case SDL_QUIT:
+			isRunning = false;
+			break;
+		default:
+			break;
+		}
+		inputManager.update(&event);
 	}
-	inputManager.update(&event);
 }
 
 void Game::tick(float fixedDeltaTime)
 {
+	LOG("[CLIENT] Tick: %llu at %.3f", ++clientTickNum, SDL_GetTicks() / 1000.0f);
 	deltaTime = fixedDeltaTime;
 	// handled at 128 hz from main loop rather than the 30 hz update tick rate we see here
 	//handleEvents(); // Input
 	update();
 	frameCount++;
+	enet_host_flush(networkManager.getClient());
 }
 
 void Game::update() {
@@ -255,9 +262,10 @@ bool Game::registerGameObject(GameObject* obj)
 
 
 
-void Game::receiveServerStateUpdate(const ServerStatePacket& state)
+void Game::receiveServerStateUpdate(const ServerStatePacket state)
 {
 	auto player = playerManager->GetPlayer(state.steamID);
+	LOG("[CLIENT] Game::receiveServerStateUpdate Received server state at tick=%llu (t=%.3f) pos=(%.3f,%.3f)", clientTickNum, SDL_GetTicks() / 1000.0f, state.posX, state.posY);
 
 	if (!player) {
 		// We don’t have a reference yet — might not have received the spawn message?
@@ -271,12 +279,14 @@ void Game::receiveServerStateUpdate(const ServerStatePacket& state)
 
 	// handle through prediction and reconciliation if this is the local player
 	if (player->getIsLocalPlayer()) {
-		player->ApplyServerState(state);
+		
 	}
 	else {
 		// Directly set the position for other clients
-		player->setLocation(static_cast<int>(state.posX), static_cast<int>(state.posY));
+		//player->setLocation(static_cast<int>(state.posX), static_cast<int>(state.posY));
 	}
+
+	player->ApplyServerState(state);
 
 
 }

@@ -9,7 +9,6 @@ Player::Player(int x, int y, int w, int h, Game& game) : GameObject(x, y, w, h, 
 }
 
 void Player::Update() {
-	// another temp meh
 	//last frame x/y change
 	lf_xchange = xchange;
 	lf_ychange = ychange;
@@ -18,13 +17,15 @@ void Player::Update() {
 	ychange = 0;
 	float deTime = gameInstance.getDeltaTime();
 
-	ychange += s_ychange * speed * deTime;
+	
 	xchange += s_xchange * speed * deTime;
+	ychange += s_ychange * speed * deTime;
+
 
 	handleCollision();
 
-	destRect.x += xchange;
-	destRect.y += ychange;
+	destRect.x += static_cast<int>(xchange);
+	destRect.y += static_cast<int>(ychange);
 }
 
 void Player::ApplyInput(const PlayerInputPacket& input)

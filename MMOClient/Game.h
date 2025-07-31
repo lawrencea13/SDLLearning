@@ -44,6 +44,7 @@ public:
 
 	NetworkManager& getNetworkManager() { return networkManager; }
 	std::shared_ptr<PlayerManager> getPlayerManager() const { return playerManager; }
+	uint64_t clientTickNum = 0;
 
 
 	// frametime info
@@ -65,7 +66,7 @@ private:
 	std::weak_ptr<Player> localPlayer;
 	std::shared_ptr<PlayerManager> playerManager;
 
-	void receiveServerStateUpdate(const ServerStatePacket& state);
+	void receiveServerStateUpdate(const ServerStatePacket state);
 	void otherPlayerConnected(const ServerStatePacket& state);
 
 	uint32_t frameCount = 0;

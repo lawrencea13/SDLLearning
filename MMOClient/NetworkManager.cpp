@@ -2,8 +2,9 @@
 #include <iostream>
 #include <steam/steam_api.h>
 #include <vector>
+#include "Logger.h"
 
-
+#define LOG(...) Logger::Log(__VA_ARGS__)
 
 NetworkManager::NetworkManager() {}
 
@@ -100,7 +101,7 @@ void NetworkManager::sendAuthToServer()
     delete[] payload;
 }
 
-void NetworkManager::sendPacket(PacketType type, const void* data, size_t size, uint8_t channel)
+void NetworkManager::sendPacket(PacketType type, const void* data, size_t size, uint8_t channel, uint32_t flags)
 {
     if (!serverPeer) return;
 
@@ -129,6 +130,8 @@ void NetworkManager::registerServerEventHandlers() {
         for (size_t i = 0; i < count; ++i) {
             ServerStatePacket state{};
             std::memcpy(&state, packet->data + i * sizeof(ServerStatePacket), sizeof(ServerStatePacket));
+
+            LOG("[CLIENT] NetworkManager received state: pos=(%f,%f) frame=%u", state.posX, state.posY, state.inputFrame);
 
             if (serverStateCallback)
                 serverStateCallback(state);
