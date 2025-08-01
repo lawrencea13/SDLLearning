@@ -378,7 +378,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>G:\repos\SDLLearning\steamworks_sdk\public;E:\ENet\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)steamworks_sdk\public;E:\ENet\include;$(SolutionDir)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -530,7 +530,6 @@
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="LevelLoader.h" />
     <ClInclude Include="NetworkManager.h" />
-    <ClInclude Include="NetworkPackets.h" />
     <ClInclude Include="ObjectRegistry.h" />
     <ClInclude Include="PacketDispatcher.h" />
     <ClInclude Include="Player.h" />

@@ -8,7 +8,7 @@
 
 #include "Player.h"
 #include "PacketDispatcher.h"
-#include "NetworkPackets.h"
+#include "Shared/NetworkPackets.h"
 
 class PlayerManager {
 public:

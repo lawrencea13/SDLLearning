@@ -7,7 +7,7 @@
 #include <steam/steam_gameserver.h>
 #include <unordered_map>
 #include "PacketDispatcher.h"
-#include "NetworkPackets.h"
+#include "Shared/NetworkPackets.h"
 
 
 class NetworkManager {

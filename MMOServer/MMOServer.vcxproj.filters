@@ -62,9 +62,6 @@
     <ClInclude Include="NetworkManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NetworkPackets.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PacketDispatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>

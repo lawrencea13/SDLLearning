@@ -2,7 +2,7 @@
 
 #include "GameObject.h"
 #include "NetworkManager.h"
-#include "NetworkPackets.h"
+#include "Shared/NetworkPackets.h"
 #include <deque>
 
 struct PlayerState {
