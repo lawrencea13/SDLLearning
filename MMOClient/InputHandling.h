@@ -36,7 +36,10 @@ public:
     }
 
 
-    bool isMouseButtonDown(Uint8 button) const {
+    bool isMouseButtonDown(Uint8 button, bool ignoreBlocking = false) const {
+        if (blockPolledInput && !ignoreBlocking) {
+            return false; // Blocked input, return false
+        }
         auto it = mouseButtonDown.find(button);
         return it != mouseButtonDown.end() && it->second;
     }
