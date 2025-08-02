@@ -58,3 +58,29 @@ std::vector<std::shared_ptr<Widget>> Canvas::getWidgetNotinLayer(const std::stri
 
     return filteredWidgets;
 }
+
+void Canvas::setFocus(Widget* w)
+{
+    if (focusedWidget && focusedWidget != w)
+        focusedWidget->setFocus(false);
+    focusedWidget = w;
+    if (focusedWidget)
+        focusedWidget->setFocus(true);
+}
+
+void Canvas::clearFocus()
+{
+    if (focusedWidget) {
+        focusedWidget->setFocus(false);
+        focusedWidget = nullptr;
+    }
+}
+
+bool Canvas::handleKeyInput(SDL_Keycode key)
+{
+    if (focusedWidget) {
+        return focusedWidget->handleKeyInput(key);
+    }
+
+    return false;
+}

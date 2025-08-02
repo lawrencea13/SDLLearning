@@ -53,6 +53,16 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, in
 		this->otherPlayerConnected(state);
 		};
 
+	networkManager.onOtherPlayerDisconnect = [this](const uint64_t steamID) {
+		auto player = playerManager->GetPlayer(steamID);
+		if(!player) {
+			std::cerr << "Warning: Attempted to remove player with SteamID: " << steamID << ", but player does not exist." << std::endl;
+			return;
+		}
+		registry.removeObject(player.get());
+		playerManager->RemovePlayer(steamID);
+		};
+
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
 		std::cout << "Subsystem initialized." << std::endl;
 		isRunning = true;
@@ -127,6 +137,18 @@ void Game::handleEvents() {
 		case SDL_QUIT:
 			isRunning = false;
 			break;
+		case SDL_KEYDOWN:
+			inputManager.onKeyDown(event.key.keysym.sym);
+			break;
+		case SDL_KEYUP:
+			inputManager.onKeyUp(event.key.keysym.sym);
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+			inputManager.onMouseButtonDown(event.button.button);
+			break;
+		case SDL_MOUSEBUTTONUP:
+			inputManager.onMouseButtonUp(event.button.button);
+			break;
 		default:
 			break;
 		}
@@ -156,8 +178,10 @@ void Game::update() {
 		networkManager.serviceNetwork();
 	}
 
-	registry.update();
+
 	widgetScreen->update();
+	registry.update();
+	
 	// camera must be kept separate as it's not a game object
 	camera.update();
 

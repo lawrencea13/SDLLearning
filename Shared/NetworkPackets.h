@@ -7,6 +7,7 @@ enum PacketType : uint8_t {
     PACKET_SERVER_STATE = 2,
     PACKET_CONNECTED_PLAYER_LIST = 3,
     PACKET_NEW_PLAYER_CONNECTED = 4,
+    PACKET_PLAYER_DISCONNECTED = 5,
 };
 
 #pragma pack(push, 1)
@@ -22,6 +23,10 @@ struct PlayerInputPacket {
     int8_t moveY;  // -1 = up, 0 = none, 1 = down
     bool attack;
     uint32_t clientInputFrame;
+};
+
+struct PlayerDisconnectedPacket {
+    uint64_t steamID;
 };
 
 #pragma pack(pop)

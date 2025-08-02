@@ -38,6 +38,7 @@ public:
     std::function<void(const ServerStatePacket&)> serverStateCallback;
     std::function<void(const ServerStatePacket&)> onPlayerStateReceived;
     std::function<void(const ServerStatePacket&)> otherPlayerConnected;
+    std::function<void(const uint64_t)> onOtherPlayerDisconnect;
 
     bool startClient(const std::string& host, int port = 1234);
 

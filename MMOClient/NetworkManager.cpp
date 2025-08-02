@@ -105,7 +105,7 @@ void NetworkManager::sendPacket(PacketType type, const void* data, size_t size, 
 {
     if (!serverPeer) return;
 
-    ENetPacket* packet = enet_packet_create(nullptr, size + 1, ENET_PACKET_FLAG_RELIABLE);
+    ENetPacket* packet = enet_packet_create(nullptr, size + 1, flags);
     packet->data[0] = static_cast<uint8_t>(type);
     std::memcpy(packet->data + 1, data, size);
     enet_peer_send(serverPeer, channel, packet);
@@ -169,6 +169,17 @@ void NetworkManager::registerServerEventHandlers() {
         if (otherPlayerConnected)
             otherPlayerConnected(state);
         });
+
+    dispatcher.registerHandler(PACKET_PLAYER_DISCONNECTED, [this](ENetPacket* packet, ENetPeer* peer) {
+        if (packet->dataLength < sizeof(uint64_t)) {
+            std::cerr << "Invalid player disconnected packet size\n";
+            return;
+        }
+        uint64_t steamID;
+        std::memcpy(&steamID, packet->data, sizeof(uint64_t));
+        if(onOtherPlayerDisconnect)
+            onOtherPlayerDisconnect(steamID);
+		});
 }
 
 

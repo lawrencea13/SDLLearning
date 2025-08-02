@@ -60,6 +60,15 @@ void Game::init() {
 			// Optional: log warning
 			std::cerr << "Tried to delete unknown player " << steamID << "\n";
 		}
+		else {
+			networkManager.broadcastToAll(
+				PACKET_PLAYER_DISCONNECTED,
+				&steamID,
+				sizeof(steamID),
+				0,
+				ENET_PACKET_FLAG_RELIABLE
+			);
+		}
 		};
 
 	return;

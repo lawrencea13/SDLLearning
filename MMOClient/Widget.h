@@ -60,13 +60,15 @@ public:
     virtual void drop(int dropX, int dropY) {}
 
     // Key input handling for text input or other keyboard interactions
-    virtual void handleKeyInput(SDL_Keycode key) {}
+	// Returns true if input was handled AND block further processing, returns false otherwise
+    virtual bool handleKeyInput(SDL_Keycode key) { return false; }
 
     const std::string& getLayer() const;
     void setLayer
     (const std::string& newLayer);
 
-    
+    virtual void setFocus(bool state) { focused = state; }
+    bool isFocused() const { return focused; }
 
 protected:
     int x, y;
@@ -83,6 +85,7 @@ protected:
     bool hovered = false;
     bool pressed = false;
     bool visible = true;
+    bool focused = false;
 
     // added later to avoid m1 being pressed before hovering over button for activation
     bool canPress = false;
