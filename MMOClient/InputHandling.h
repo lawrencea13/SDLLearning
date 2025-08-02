@@ -1,10 +1,10 @@
 #pragma once
 
 #include <SDL.h>
-#include <unordered_map>
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include <functional>
 
 class InputHandler {
 
@@ -24,7 +24,10 @@ public:
         pressedKeys.clear();
     }
 
-    bool isKeyDown(SDL_Keycode key) const {
+    bool isKeyDown(SDL_Keycode key, bool ignoreBlocking = false) const {
+        if (blockPolledInput && !ignoreBlocking) {
+            return false; // Blocked input, return false
+		}
         return std::find(pressedKeys.begin(), pressedKeys.end(), key) != pressedKeys.end();
     }
 
@@ -42,13 +45,13 @@ public:
     int getMouseY() const { return mouseY; }
 
     void onKeyDown(SDL_Keycode key) {
+        for (auto& cb : keyDownListeners) {
+            cb(key);
+        }
+
         if (std::find(pressedKeys.begin(), pressedKeys.end(), key) == pressedKeys.end() &&
             pressedKeys.size() < MAX_KEYS) {
             pressedKeys.push_back(key);
-        }
-
-        for (auto& cb : keyDownListeners) {
-            cb(key);
         }
     }
 
@@ -77,6 +80,10 @@ public:
         keyUpListeners.push_back(cb);
     }
 
+    void setBlockPolledInput(bool block) {
+        blockPolledInput = block;
+	}
+
 private:
     std::vector<SDL_Keycode> pressedKeys;
     // simpler, order not needed so map works fine.
@@ -86,4 +93,6 @@ private:
 
     std::vector<KeyCallback> keyDownListeners;
     std::vector<KeyCallback> keyUpListeners;
+
+    bool blockPolledInput = false; // block polled input
 };
