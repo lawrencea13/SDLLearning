@@ -10,14 +10,14 @@ class InputHandler {
 
 public:
     using KeyCallback = std::function<void(SDL_Keycode)>;
+    using MouseMoveCallback = std::function<void(int, int)>;
+    using MouseButtonCallback = std::function<void(Uint8)>;
+    using ListenerHandle = size_t;
 
     static constexpr size_t MAX_KEYS = 10;
 
     void update(SDL_Event* event) {
-        if (event->type == SDL_MOUSEMOTION) {
-            mouseX = event->motion.x;
-            mouseY = event->motion.y;
-        }
+
     }
 
     void clearPressedKeys() {
@@ -48,8 +48,8 @@ public:
     int getMouseY() const { return mouseY; }
 
     void onKeyDown(SDL_Keycode key) {
-        for (auto& cb : keyDownListeners) {
-            cb(key);
+        for (const auto& pair : keyDownListeners) {
+            pair.second(key);
         }
 
         if (std::find(pressedKeys.begin(), pressedKeys.end(), key) == pressedKeys.end() &&
@@ -59,33 +59,87 @@ public:
     }
 
     void onKeyUp(SDL_Keycode key) {
+        for (const auto& pair : keyUpListeners) {
+            pair.second(key);
+        }
+
         auto it = std::remove(pressedKeys.begin(), pressedKeys.end(), key);
         pressedKeys.erase(it, pressedKeys.end());
-
-        for (auto& cb : keyUpListeners) {
-            cb(key);
-        }
     }
 
     void onMouseButtonDown(Uint8 button) {
+        for (const auto& pair : mouseDownListeners) {
+            pair.second(button);
+        }
         mouseButtonDown[button] = true;
 	}
 
     void onMouseButtonUp(Uint8 button) {
+        for (const auto& pair : mouseUpListeners) {
+            pair.second(button);
+        }
         mouseButtonDown[button] = false;
     }
 
-    // callback registration
-    void registerKeyDownListener(const KeyCallback& cb) {
-        keyDownListeners.push_back(cb);
-    }
-    void registerKeyUpListener(const KeyCallback& cb) {
-        keyUpListeners.push_back(cb);
-    }
+    void onMouseMotion(int x, int y) {
+        for (const auto& pair : mouseMoveListeners) {
+            pair.second(x, y);
+        }
+
+        mouseX = x;
+        mouseY = y;
+	}
 
     void setBlockPolledInput(bool block) {
         blockPolledInput = block;
-	}
+    }
+
+#pragma region Key Press listeners
+
+    ListenerHandle  registerKeyDownListener(const KeyCallback& cb) {
+        keyDownListeners[nextKeyDownHandle] = cb;
+        return nextKeyDownHandle++;
+    }
+    ListenerHandle  registerKeyUpListener(const KeyCallback& cb) {
+        keyUpListeners[nextKeyUpHandle] = cb;
+        return nextKeyUpHandle++;
+    }
+
+    void removeKeyDownListener(ListenerHandle handle) {
+        keyDownListeners.erase(handle);
+    }
+    void removeKeyUpListener(ListenerHandle handle) {
+        keyUpListeners.erase(handle);
+    }
+#pragma endregion
+
+#pragma region Mouse Listeners button/movement
+
+    ListenerHandle  registerMouseDownListener(const MouseButtonCallback& cb) {
+        mouseDownListeners[nextMouseDownHandle] = cb;
+        return nextMouseDownHandle++;
+    }
+    ListenerHandle  registerMouseUpListener(const MouseButtonCallback& cb) {
+        mouseUpListeners[nextMouseUpHandle] = cb;
+        return nextMouseUpHandle++;
+    }
+    ListenerHandle  registerMouseMoveListener(const MouseMoveCallback& cb) {
+        mouseMoveListeners[nextmouseMoveHandle] = cb;
+        return nextmouseMoveHandle++;
+    }
+
+    void removeMouseUpListener(ListenerHandle handle) {
+        keyDownListeners.erase(handle);
+    }
+    void removeMouseDownListener(ListenerHandle handle) {
+        mouseDownListeners.erase(handle);
+    }
+    void removeMouseMoveListener(ListenerHandle handle) {
+        mouseMoveListeners.erase(handle);
+    }
+  
+#pragma endregion
+
 
 private:
     std::vector<SDL_Keycode> pressedKeys;
@@ -94,8 +148,18 @@ private:
     int mouseX = 0;
     int mouseY = 0;
 
-    std::vector<KeyCallback> keyDownListeners;
-    std::vector<KeyCallback> keyUpListeners;
+    std::unordered_map<ListenerHandle, KeyCallback> keyDownListeners;
+    std::unordered_map<ListenerHandle, KeyCallback> keyUpListeners;
+    std::unordered_map<ListenerHandle, MouseMoveCallback> mouseMoveListeners;
+    std::unordered_map<ListenerHandle, MouseButtonCallback> mouseDownListeners;
+    std::unordered_map<ListenerHandle, MouseButtonCallback> mouseUpListeners;
 
-    bool blockPolledInput = false; // block polled input
+    // store handles for deregistration as needed
+    ListenerHandle nextKeyDownHandle = 1;
+    ListenerHandle nextKeyUpHandle = 1;
+    ListenerHandle nextmouseMoveHandle = 1;
+    ListenerHandle nextMouseDownHandle = 1;
+    ListenerHandle nextMouseUpHandle = 1;
+
+    bool blockPolledInput = false;
 };

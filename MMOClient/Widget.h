@@ -3,15 +3,16 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <memory>
-#include "InputHandling.h"
+#include <string>
 
 class Widget {
 public:
     // Constructor for color-only widget
-    Widget(int x, int y, int width, int height, SDL_Color color, InputHandler* input, std::shared_ptr<TTF_Font> font = nullptr);
+    Widget(int x, int y, int width, int height, SDL_Color color, std::shared_ptr<TTF_Font> font = nullptr);
 
     // Constructor for texture-based widget
     Widget(int x, int y, int width, int height, std::shared_ptr<SDL_Texture> texture, std::shared_ptr<TTF_Font> font = nullptr);
+
 
     virtual ~Widget() = default;
 
@@ -61,7 +62,13 @@ public:
 
     // Key input handling for text input or other keyboard interactions
 	// Returns true if input was handled AND block further processing, returns false otherwise
-    virtual bool handleKeyInput(SDL_Keycode key) { return false; }
+    virtual void handleKeyDown(SDL_Keycode key) {};
+    virtual void handleKeyUp(SDL_Keycode key) {};
+
+    virtual void handleMouseDown(Uint8 button) {};
+    virtual void handleMouseUp(Uint8 button) {}
+
+    virtual void handleMouseMove(int x, int y) {};
 
     const std::string& getLayer() const;
     void setLayer
@@ -69,6 +76,16 @@ public:
 
     virtual void setFocus(bool state) { focused = state; }
     bool isFocused() const { return focused; }
+
+    virtual bool containsPoint(int px, int py) const {
+        return px >= x && px < x + width && py >= y && py < y + height;
+    }
+
+    // if true, the input system will not pass input on to polling systems like the player.
+	bool getConsumeInput() const { return consumeInput; }
+    virtual void setConsumeInput(bool state) { consumeInput = state; }
+
+    
 
 protected:
     int x, y;
@@ -87,10 +104,8 @@ protected:
     bool visible = true;
     bool focused = false;
 
-    // added later to avoid m1 being pressed before hovering over button for activation
-    bool canPress = false;
-
-    InputHandler* input;
+    // if true, the input system will not pass input on to polling systems like the player.
+	bool consumeInput = true;
 
     virtual void drawImpl(SDL_Renderer* renderer) = 0;
 

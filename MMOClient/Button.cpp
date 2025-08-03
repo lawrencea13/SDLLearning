@@ -2,8 +2,8 @@
 #include <iostream>
 
 
-Button::Button(int x, int y, int width, int height, SDL_Color color, const std::string& label, InputHandler* inputMgr, std::shared_ptr<TTF_Font> font)
-    : Widget(x, y, width, height, color, inputMgr, font), label(label)
+Button::Button(int x, int y, int width, int height, SDL_Color color, const std::string& label, std::shared_ptr<TTF_Font> font)
+    : Widget(x, y, width, height, color, font), label(label)
 {
 
 }
@@ -15,7 +15,6 @@ Button::Button(int x, int y, int width, int height, std::shared_ptr<SDL_Texture>
 void Button::drawImpl(SDL_Renderer* renderer) {
     SDL_Rect destRect = { x, y, width, height };
     //SDL_RenderCopy(renderer, texture.get(), nullptr, &destRect);
-
     SDL_SetRenderDrawColor(renderer, color.r + colorModulation.r, color.g + colorModulation.g, color.b + colorModulation.b, color.a);
     SDL_RenderFillRect(renderer, &destRect);
 

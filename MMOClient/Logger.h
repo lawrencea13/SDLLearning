@@ -25,7 +25,6 @@ public:
         }
     }
 
-    // Use like: Logger::Log("[CLIENT] Tick: %llu at %.3f", tickNum, time);
     static void Log(const char* fmt, ...) {
         std::lock_guard<std::mutex> lock(GetMutex());
         if (!GetFile()) return;

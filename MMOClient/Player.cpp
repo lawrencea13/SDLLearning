@@ -10,7 +10,6 @@
 Player::Player(int x, int y, int w, int h, std::shared_ptr<SDL_Texture> tex, Game& game) : GameObject(x, y, w, h, tex, game), input(game.getInputHandler()), posX(float(x)), posY(float(y))
 {
 	collisionEnabled = true;
-
 }
 
 void Player::Update() {
@@ -194,7 +193,6 @@ void Player::Render() {
 		return localTestRender();
 	}
 
-
 	double now = Seconds(Clock::now().time_since_epoch()).count();
 	double renderTime = now - INTERP_DELAY;
 
@@ -319,7 +317,7 @@ void Player::sendInput(uint32_t currentFrame)
 	gameInstance.getNetworkManager()
 		.sendPacket(PACKET_INPUT_COMMAND, &pkt, sizeof(pkt), 0, ENET_PACKET_FLAG_UNSEQUENCED);
 
-	LOG("[CLIENT] Sent input for tick=%llu at %.3f", gameInstance.clientTickNum, SDL_GetTicks() / 1000.0f);
+	//LOG("[CLIENT] Sent input for tick=%llu at %.3f", gameInstance.clientTickNum, SDL_GetTicks() / 1000.0f);
 }
 
 void Player::storeState(uint32_t frame)

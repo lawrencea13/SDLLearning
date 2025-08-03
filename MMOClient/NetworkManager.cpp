@@ -131,7 +131,7 @@ void NetworkManager::registerServerEventHandlers() {
             ServerStatePacket state{};
             std::memcpy(&state, packet->data + i * sizeof(ServerStatePacket), sizeof(ServerStatePacket));
 
-            LOG("[CLIENT] NetworkManager received state: pos=(%f,%f) frame=%u", state.posX, state.posY, state.inputFrame);
+            //LOG("[CLIENT] NetworkManager received state: pos=(%f,%f) frame=%u", state.posX, state.posY, state.inputFrame);
 
             if (serverStateCallback)
                 serverStateCallback(state);

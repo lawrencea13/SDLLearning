@@ -29,6 +29,7 @@ public:
 	void clientHandleInitialConnect(const ServerStatePacket& state);
 	std::shared_ptr<Player> getLocalPlayer() { return localPlayer.lock(); }
 	void setLocalPlayer(std::shared_ptr<Player> player) { localPlayer = player; }
+	void networkEventHandlers();
 
 	bool onGameObjectCreated(GameObject* obj);
 	bool registerGameObject(GameObject* obj);

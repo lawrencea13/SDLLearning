@@ -1,7 +1,7 @@
 #include "Widget.h"
 
-Widget::Widget(int x, int y, int width, int height, SDL_Color color, InputHandler* inputMgr, std::shared_ptr<TTF_Font> font)
-    : x(x), y(y), width(width), height(height), color(color), texture(nullptr), hasTexture(false), colorModulation{ 0, 0, 0, 0 }, input(inputMgr), font(font) {}
+Widget::Widget(int x, int y, int width, int height, SDL_Color color, std::shared_ptr<TTF_Font> font)
+    : x(x), y(y), width(width), height(height), color(color), texture(nullptr), hasTexture(false), colorModulation{ 0, 0, 0, 0 }, font(font) {}
 
 Widget::Widget(int x, int y, int width, int height, std::shared_ptr<SDL_Texture> texture, std::shared_ptr<TTF_Font> font)
     : x(x), y(y), width(width), height(height), color({ 0, 0, 0, 0 }), texture(texture), hasTexture(true), colorModulation{ 0, 0, 0, 0 }, font(font) {}
@@ -29,43 +29,11 @@ void Widget::draw(SDL_Renderer* renderer) {
 
 void Widget::update()
 {
-
-
-    SDL_Point mouseLocation = { input->getMouseX(), input->getMouseY() };
-    bool priorFrameCanPress = canPress; 
-
     // instead of nesting, reset the button and return
     if (!isVisible()) {
         setPressed(false);
         setHovered(false);
-        canPress = false;
         return;
-    }
-
-    bool isHovering = (mouseLocation.x > x && mouseLocation.x < x + width &&
-        mouseLocation.y > y && mouseLocation.y < y + height);
-
-    setHovered(isHovering);
-
-    if (isHovering) {
-        if (input->isMouseButtonDown(SDL_BUTTON_LEFT)) {
-            if (priorFrameCanPress) {
-                setPressed(true);
-            }
-            else {
-                canPress = false;
-            }
-        }
-        else {
-            setPressed(false);
-            canPress = true;
-        }
-    }
-    else {
-        setPressed(false);
-        // Instead of doing a bunch of complex checks, just set canPress to the opposite of mouse down since that/
-        //  makes the widget not clickable if you were holding M1 before you dragged...DUH
-        canPress = !input->isMouseButtonDown(SDL_BUTTON_LEFT);
     }
     
 }
@@ -99,6 +67,7 @@ bool Widget::isEnabled() const
 
 void Widget::setEnabled(bool state)
 {
+	enabled = state;
 }
 
 bool Widget::isHovered() const
@@ -145,6 +114,7 @@ bool Widget::isVisible() const
 
 void Widget::setVisible(bool state)
 {
+    visible = state;
 }
 
 const std::string& Widget::getLayer() const {

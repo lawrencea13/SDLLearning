@@ -41,27 +41,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, in
 		}
 	}
 
-	networkManager.onPlayerStateReceived = [this](const ServerStatePacket& state) {
-		this->clientHandleInitialConnect(state);
-		};
-	
-	networkManager.serverStateCallback = [this](const ServerStatePacket state) {
-		this->receiveServerStateUpdate(state);
-		};
-
-	networkManager.otherPlayerConnected = [this](const ServerStatePacket& state) {
-		this->otherPlayerConnected(state);
-		};
-
-	networkManager.onOtherPlayerDisconnect = [this](const uint64_t steamID) {
-		auto player = playerManager->GetPlayer(steamID);
-		if(!player) {
-			std::cerr << "Warning: Attempted to remove player with SteamID: " << steamID << ", but player does not exist." << std::endl;
-			return;
-		}
-		registry.removeObject(player.get());
-		playerManager->RemovePlayer(steamID);
-		};
+	networkEventHandlers();
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
 		std::cout << "Subsystem initialized." << std::endl;
@@ -95,7 +75,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, in
 
 	textureManager = new TextureManager(renderer);
 	fontManager = new FontManager();
-	widgetScreen = std::make_unique<Canvas>(renderer);
+	widgetScreen = std::make_unique<Canvas>(renderer, &inputManager);
 
 
 
@@ -109,26 +89,26 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, in
 
 	//SDL_Color* testColor = new SDL_Color{ 0, 0, 255 ,255 };
 	//new Wall(0, 500, 1280, 300, testColor, renderer, nullptr, true, *this);
-	/*std::shared_ptr<TTF_Font> font = fontManager->getFont("Assets\\IMMORTAL.ttf", 24);
+	std::shared_ptr<TTF_Font> font = fontManager->getFont("Assets\\IMMORTAL.ttf", 24);
 	std::shared_ptr<TTF_Font> largeFont = fontManager->getFont("Assets\\IMMORTAL.ttf", 30);
 
 	if (font) {
 		std::cerr << "Font was loaded succesfully" << std::endl;
 	}
 	
-	std::shared_ptr<Button> testButton = std::make_shared<Button>(100, 100, 200, 100, SDL_Color{ 0, 100, 100, 100 }, "Test Button", &inputManager, font);
-	testButton->setOnRelease([]() {
-		std::cout << "Start button pressed!" << std::endl;
-
-		});
+	std::shared_ptr<Button> testButton = std::make_shared<Button>(500, 100, 200, 100, SDL_Color{ 0, 100, 100, 100 }, "Test Button", font);
 
 	widgetScreen->addWidget(testButton);
-	widgetScreen->addWidget(std::make_shared<Button>(400, 100, 200, 100, SDL_Color{ 0, 100, 100, 100 }, "Test Button", &inputManager, largeFont));*/
+
+
+	//widgetScreen->addWidget(std::make_shared<Button>(400, 100, 200, 100, SDL_Color{ 0, 100, 100, 100 }, "Test Button", &inputManager, largeFont));
 
 	
 
 }
 
+
+#pragma region Constant Events(tick/update/render)
 
 void Game::handleEvents() {
 	//SDL_PollEvent(&event);
@@ -149,16 +129,20 @@ void Game::handleEvents() {
 		case SDL_MOUSEBUTTONUP:
 			inputManager.onMouseButtonUp(event.button.button);
 			break;
+		case SDL_MOUSEMOTION:
+			inputManager.onMouseMotion(event.motion.x, event.motion.y);
+			break;
 		default:
 			break;
 		}
-		inputManager.update(&event);
+		// legacy system used for polling
+		// inputManager.update(&event);
 	}
 }
 
 void Game::tick(float fixedDeltaTime)
 {
-	LOG("[CLIENT] Tick: %llu at %.3f", ++clientTickNum, SDL_GetTicks() / 1000.0f);
+	//LOG("[CLIENT] Tick: %llu at %.3f", ++clientTickNum, SDL_GetTicks() / 1000.0f);
 	deltaTime = fixedDeltaTime;
 	// handled at 128 hz from main loop rather than the 30 hz update tick rate we see here
 	//handleEvents(); // Input
@@ -181,7 +165,7 @@ void Game::update() {
 
 	widgetScreen->update();
 	registry.update();
-	
+
 	// camera must be kept separate as it's not a game object
 	camera.update();
 
@@ -199,14 +183,10 @@ void Game::render() {
 	SDL_RenderPresent(renderer);
 }
 
+#pragma endregion
 
-void Game::clean() {
-	SDL_DestroyWindow(window);
-	SDL_DestroyRenderer(renderer);
-	TTF_Quit();
-	SDL_Quit();
-	enet_deinitialize();
-}
+
+#pragma region Networking
 
 void Game::SteamLogin()
 {
@@ -237,7 +217,6 @@ void Game::SteamLogin()
 	}
 
 }
-
 
 void Game::clientHandleInitialConnect(const ServerStatePacket& state)
 {
@@ -272,24 +251,35 @@ void Game::clientHandleInitialConnect(const ServerStatePacket& state)
 
 }
 
-bool Game::onGameObjectCreated(GameObject* obj)
+void Game::networkEventHandlers()
 {
-	return registerGameObject(obj);
+	networkManager.onPlayerStateReceived = [this](const ServerStatePacket& state) {
+		this->clientHandleInitialConnect(state);
+		};
+
+	networkManager.serverStateCallback = [this](const ServerStatePacket state) {
+		this->receiveServerStateUpdate(state);
+		};
+
+	networkManager.otherPlayerConnected = [this](const ServerStatePacket& state) {
+		this->otherPlayerConnected(state);
+		};
+
+	networkManager.onOtherPlayerDisconnect = [this](const uint64_t steamID) {
+		auto player = playerManager->GetPlayer(steamID);
+		if (!player) {
+			std::cerr << "Warning: Attempted to remove player with SteamID: " << steamID << ", but player does not exist." << std::endl;
+			return;
+		}
+		registry.removeObject(player.get());
+		playerManager->RemovePlayer(steamID);
+		};
 }
-
-bool Game::registerGameObject(GameObject* obj)
-{
-	registry.registerObject(obj);
-	std::cout << "GameObject Registered" << std::endl;
-	return true;
-}
-
-
 
 void Game::receiveServerStateUpdate(const ServerStatePacket state)
 {
 	auto player = playerManager->GetPlayer(state.steamID);
-	LOG("[CLIENT] Game::receiveServerStateUpdate Received server state at tick=%llu (t=%.3f) pos=(%.3f,%.3f)", clientTickNum, SDL_GetTicks() / 1000.0f, state.posX, state.posY);
+	//LOG("[CLIENT] Game::receiveServerStateUpdate Received server state at tick=%llu (t=%.3f) pos=(%.3f,%.3f)", clientTickNum, SDL_GetTicks() / 1000.0f, state.posX, state.posY);
 
 	if (!player) {
 		// We don’t have a reference yet — might not have received the spawn message?
@@ -335,4 +325,29 @@ void Game::otherPlayerConnected(const ServerStatePacket& state)
 
 }
 
+#pragma endregion
 
+
+#pragma region GameObject Management
+
+bool Game::onGameObjectCreated(GameObject* obj)
+{
+	return registerGameObject(obj);
+}
+
+bool Game::registerGameObject(GameObject* obj)
+{
+	registry.registerObject(obj);
+	std::cout << "GameObject Registered" << std::endl;
+	return true;
+}
+
+void Game::clean() {
+	SDL_DestroyWindow(window);
+	SDL_DestroyRenderer(renderer);
+	TTF_Quit();
+	SDL_Quit();
+	enet_deinitialize();
+}
+
+#pragma endregion
